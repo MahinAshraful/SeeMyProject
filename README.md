@@ -1,24 +1,24 @@
-This is my boilderplate for a simple and flexible system for handling user logins and signups. It comes with the basic features you need, like creating accounts, logging in, verifying emails, resetting passwords, and giving users access to certain areas using JWT. 
+This is my boilderplate for a simple and flexible system for handling user logins and signups. It comes with the basic features you need, like creating accounts, logging in, verifying emails, resetting passwords, and giving users access to certain areas using JWT.
 
 It’s a great starting point if you need to set up full authentication for your app. The frontend is made with **React**, the backend runs on **Express**, and **MongoDB** is used as the database. You can easily change or add features to fit your project.
 
-## Tech Stack
+**Frontend**:
 
-[![AuthX](https://skillicons.dev/icons?i=react,express,nodejs,mongodb,js,vercel,postman,md,npm,git,github,vscode&perline=6)](https://github.com/ramxcodes)
-
-**Frontend**: 
 - React for the user interface and state management.
 
-**Backend**: 
+**Backend**:
+
 - Express for handling server-side logic and API routes.
 - MongoDB for database storage and Mongoose for data modeling.
 - Mailtrap for email services (email verification, password reset).
 
 **Security**:
+
 - JWT for authentication and secure token management.
 - Bcrypt for password hashing.
 
 **Other Tools**:
+
 - Dotenv for managing environment variables.
 - Cookie-parser for handling cookies in requests.
 
@@ -46,18 +46,20 @@ It’s a great starting point if you need to set up full authentication for your
    ```bash
    git clone https://github.com/MahinAshraful/userauthtemplateMERN.git
    ```
-   
 2. Navigate into the project directory:
+
    ```bash
    cd userauthtemplateMERN
    ```
 
 3. Install server dependencies:
+
    ```bash
    npm install
    ```
 
 4. Install front end dependencies:
+
    ```bash
    cd frontend
    npm install
@@ -77,11 +79,13 @@ It’s a great starting point if you need to set up full authentication for your
 ### Running the Application
 
 1. Start the backend server:
+
    ```bash
    npm start
    ```
 
 2. Start the React frontend:
+
    ```bash
    cd frontend
    npm start

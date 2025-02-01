@@ -5,24 +5,25 @@ export const VERIFICATION_EMAIL_TEMPLATE = `
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Verify Your Email</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
-<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-  <div style="background: linear-gradient(to right, #4CAF50, #45a049); padding: 20px; text-align: center;">
-    <h1 style="color: white; margin: 0;">Verify Your Email</h1>
+<body style="font-family: 'Press Start 2P', cursive; line-height: 1.6; color: #FFD700; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #000000;">
+  <div style="background: linear-gradient(to right, #0000FF, #000088); padding: 20px; text-align: center; border: 4px solid #FFD700;">
+    <h1 style="color: #FFD700; margin: 0; font-size: 24px;">VERIFY EMAIL</h1>
   </div>
-  <div style="background-color: #f9f9f9; padding: 20px; border-radius: 0 0 5px 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-    <p>Hello,</p>
-    <p>Thank you for signing up! Your verification code is:</p>
+  <div style="background-color: #000033; padding: 20px; border-radius: 0 0 5px 5px; box-shadow: 0 2px 5px rgba(255,215,0,0.3); border: 4px solid #FFD700; border-top: none;">
+    <p>PLAYER 1,</p>
+    <p>WELCOME TO SEEMYPROJECT! YOUR VERIFICATION CODE IS:</p>
     <div style="text-align: center; margin: 30px 0;">
-      <span style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #4CAF50;">{verificationCode}</span>
+      <span style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #FF0000;">{verificationCode}</span>
     </div>
-    <p>Enter this code on the verification page to complete your registration.</p>
-    <p>This code will expire in 15 minutes for security reasons.</p>
-    <p>If you didn't create an account with us, please ignore this email.</p>
-    <p>Best regards,<br>AuthX</p>
+    <p>ENTER THIS CODE TO START!</p>
+    <p style="color: #FF0000;">WARNING: CODE EXPIRES IN 15 MINUTES!</p>
+    <p>IF YOU DIDN'T JOIN OUR ARCADE, GAME OVER!</p>
+    <p>POWER UP!<br>PAC-AUTH</p>
   </div>
-  <div style="text-align: center; margin-top: 20px; color: #888; font-size: 0.8em;">
-    <p>This is an automated message, please do not reply to this email.</p>
+  <div style="text-align: center; margin-top: 20px; color: #4444FF; font-size: 0.8em;">
+    <p>AUTOMATED MESSAGE - NO CONTINUES!</p>
   </div>
 </body>
 </html>
@@ -34,32 +35,32 @@ export const PASSWORD_RESET_SUCCESS_TEMPLATE = `
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Password Reset Successful</title>
+  <title>Password Reset Success</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
-<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-  <div style="background: linear-gradient(to right, #4CAF50, #45a049); padding: 20px; text-align: center;">
-    <h1 style="color: white; margin: 0;">Password Reset Successful</h1>
+<body style="font-family: 'Press Start 2P', cursive; line-height: 1.6; color: #FFD700; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #000000;">
+  <div style="background: linear-gradient(to right, #0000FF, #000088); padding: 20px; text-align: center; border: 4px solid #FFD700;">
+    <h1 style="color: #FFD700; margin: 0; font-size: 24px;">PASSWORD UPGRADED!</h1>
   </div>
-  <div style="background-color: #f9f9f9; padding: 20px; border-radius: 0 0 5px 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-    <p>Hello,</p>
-    <p>We're writing to confirm that your password has been successfully reset.</p>
+  <div style="background-color: #000033; padding: 20px; border-radius: 0 0 5px 5px; box-shadow: 0 2px 5px rgba(255,215,0,0.3); border: 4px solid #FFD700; border-top: none;">
+    <p>PLAYER 1,</p>
+    <p>LEVEL UP! PASSWORD SUCCESSFULLY CHANGED!</p>
     <div style="text-align: center; margin: 30px 0;">
-      <div style="background-color: #4CAF50; color: white; width: 50px; height: 50px; line-height: 50px; border-radius: 50%; display: inline-block; font-size: 30px;">
-        ✓
+      <div style="background-color: #FFD700; color: #000000; width: 50px; height: 50px; line-height: 50px; border-radius: 50%; display: inline-block; font-size: 30px;">
+        ★
       </div>
     </div>
-    <p>If you did not initiate this password reset, please contact our support team immediately.</p>
-    <p>For security reasons, we recommend that you:</p>
-    <ul>
-      <li>Use a strong, unique password</li>
-      <li>Enable two-factor authentication if available</li>
-      <li>Avoid using the same password across multiple sites</li>
+    <p style="color: #FF0000;">IF THIS WASN'T YOU, CONTACT THE GAME MASTERS!</p>
+    <p>BONUS TIPS:</p>
+    <ul style="list-style-type: none; padding-left: 0;">
+      <li>→ USE A MIGHTY PASSWORD</li>
+      <li>→ ACTIVATE SHIELD (2FA)</li>
+      <li>→ DON'T SHARE POWER-UPS</li>
     </ul>
-    <p>Thank you for helping us keep your account secure.</p>
-    <p>Best regards,<br>AuthX</p>
+    <p>GAME ON!<br>PAC-AUTH</p>
   </div>
-  <div style="text-align: center; margin-top: 20px; color: #888; font-size: 0.8em;">
-    <p>This is an automated message, please do not reply to this email.</p>
+  <div style="text-align: center; margin-top: 20px; color: #4444FF; font-size: 0.8em;">
+    <p>AUTOMATED MESSAGE - NO CONTINUES!</p>
   </div>
 </body>
 </html>
@@ -72,23 +73,24 @@ export const PASSWORD_RESET_REQUEST_TEMPLATE = `
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Reset Your Password</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
-<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-  <div style="background: linear-gradient(to right, #4CAF50, #45a049); padding: 20px; text-align: center;">
-    <h1 style="color: white; margin: 0;">Password Reset</h1>
+<body style="font-family: 'Press Start 2P', cursive; line-height: 1.6; color: #FFD700; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #000000;">
+  <div style="background: linear-gradient(to right, #0000FF, #000088); padding: 20px; text-align: center; border: 4px solid #FFD700;">
+    <h1 style="color: #FFD700; margin: 0; font-size: 24px;">PASSWORD RESTART</h1>
   </div>
-  <div style="background-color: #f9f9f9; padding: 20px; border-radius: 0 0 5px 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-    <p>Hello,</p>
-    <p>We received a request to reset your password. If you didn't make this request, please ignore this email.</p>
-    <p>To reset your password, click the button below:</p>
+  <div style="background-color: #000033; padding: 20px; border-radius: 0 0 5px 5px; box-shadow: 0 2px 5px rgba(255,215,0,0.3); border: 4px solid #FFD700; border-top: none;">
+    <p>PLAYER 1,</p>
+    <p>SOMEONE REQUESTED A PASSWORD RESTART. IF NOT YOU, GAME OVER THIS EMAIL!</p>
+    <p>PRESS START TO RESET:</p>
     <div style="text-align: center; margin: 30px 0;">
-      <a href="{resetURL}" style="background-color: #4CAF50; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">Reset Password</a>
+      <a href="{resetURL}" style="background-color: #FF0000; color: #FFD700; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; border: 2px solid #FFD700;">START RESET</a>
     </div>
-    <p>This link will expire in 1 hour for security reasons.</p>
-    <p>Best regards,<br>AuthX</p>
+    <p style="color: #FF0000;">POWER-UP EXPIRES IN 1 HOUR!</p>
+    <p>GAME ON!<br>PAC-AUTH</p>
   </div>
-  <div style="text-align: center; margin-top: 20px; color: #888; font-size: 0.8em;">
-    <p>This is an automated message, please do not reply to this email.</p>
+  <div style="text-align: center; margin-top: 20px; color: #4444FF; font-size: 0.8em;">
+    <p>AUTOMATED MESSAGE - NO CONTINUES!</p>
   </div>
 </body>
 </html>
