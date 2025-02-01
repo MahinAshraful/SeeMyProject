@@ -125,7 +125,7 @@ def get_input():
     generated_content = generate_project_explanation(attributes)
     final_output = generate_components(generated_content)
 
-    return jsonify({'meesage': final_output})
+    return jsonify({'message': final_output})
 
 if __name__ == '__main__':
     app.run(debug=True, port=5002)
