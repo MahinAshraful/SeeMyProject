@@ -19,6 +19,7 @@ import requests
 
 load_dotenv()
 app = Flask(__name__)
+CORS(app)
 
 #Gemini API Key
 api_key = os.getenv('GEMINI_API_KEY')
@@ -83,9 +84,9 @@ def generate_components(llm_output):
     return res
 
 #Testing the function
-generated_content = generate_project_explanation(user_input)
-final_res = generate_components(generated_content)
-print(final_res)
+#generated_content = generate_project_explanation(user_input)
+#final_res = generate_components(generated_content)
+#print(final_res)
 
 
 #Endpoint to fetch data from react frontend
