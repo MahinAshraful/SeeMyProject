@@ -5,12 +5,6 @@
     done - define endpoints
     done - test
     - deploy
-
-    - Attributes required from frontend: project_name, project_description, technologies
-    - Attributes optional from frontend: target_indsutry, target_audience, use_cases, addtional info
-    
-    - Attributes to be generated in json: system, components. For each component: name, type, description, interactions
-
     
     1. Redefine the input and ask gemini to expand on the project. 
     2. Use the expanded text to generate the 5 components
@@ -22,11 +16,9 @@ from flask_cors import CORS
 from dotenv import load_dotenv
 import os
 import requests
-import random
 
 load_dotenv()
 app = Flask(__name__)
-
 
 #Gemini API Key
 api_key = os.getenv('GEMINI_API_KEY')
@@ -55,12 +47,20 @@ def generate_project_explanation(user_input):
     target_audience = user_input.get('target_audience', '')
     addtional_info = user_input.get('addtional_info', '')
 
-    #Required Output Attributes
-    output_features = "system, components. For each component: name, type, description, interactions"
-
     #Prompt
     text_prompt = f"We want to create a {project_name} app. The app will {project_description}. We want to try to use {technologies}. We are relatively new to using {new_technologies}. Create a step-by-step plan to create this project. Suggest the tools and technologies to use and best practices. Return a plan that covers everything from frontend, backend, database, apis and packages to deployment."
-    print(text_prompt)
+    
+    #Optional Prompt
+    optional_prompt = ""
+    if target_indsutry:
+        optional_prompt += f"Our app's Target Industry is {target_indsutry}. "
+    if target_audience:
+        optional_prompt += f"Our app's Target Audience is {target_audience}. "
+    if addtional_info:
+        optional_prompt += f"Also, {addtional_info}. "
+
+    #Final Prompt
+    text_prompt = text_prompt + optional_prompt
 
     url = f'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key={api_key}'
     data = dict(contents=[dict(parts=[dict(text=text_prompt)])])
@@ -70,11 +70,10 @@ def generate_project_explanation(user_input):
     return res
 
 
-def generate_components(lllm_output):
-
+def generate_components(llm_output):
 
     #Prompt
-    text_prompt = f"Use the following explanation to formally structure and categorize our project plan into json format. I want the plan to have 5 components: frontend, backend, database, API and packages, Deployment. Each of these components will further have: Tech Stack, Alternative technologies, Purpose and Getting-Started. \n\n {lllm_output}"
+    text_prompt = f"Use the following explanation to formally structure and categorize our project plan into json format. I want the plan to have 5 components: frontend, backend, database, API and packages, Deployment. Each of these components will further have: Tech Stack, Alternative technologies, Purpose and Getting-Started. \n\n {llm_output}"
 
     url = f'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key={api_key}'
     data = dict(contents=[dict(parts=[dict(text=text_prompt)])])
@@ -84,9 +83,9 @@ def generate_components(lllm_output):
     return res
 
 #Testing the function
-#generated_content = generate_project_explanation(user_input)
-#final_res = generate_components(generated_content)
-#print(final_res)
+generated_content = generate_project_explanation(user_input)
+final_res = generate_components(generated_content)
+print(final_res)
 
 
 #Endpoint to fetch data from react frontend
@@ -121,7 +120,7 @@ def get_input():
         'addtional_info': addtional_info
     }
 
-    # Generate UML content
+    # Generate System Design content
     generated_content = generate_project_explanation(attributes)
     final_output = generate_components(generated_content)
 
