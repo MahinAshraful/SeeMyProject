@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>auth.route.js Explanation</title>
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+				line-height: 1.6;
+				margin: 20px;
+			}
+			h1,
+			h2,
+			h3 {
+				color: #333;
+			}
+			code {
+				background-color: #f4f4f4;
+				padding: 2px 4px;
+				border-radius: 4px;
+			}
+			pre {
+				background-color: #f4f4f4;
+				padding: 10px;
+				border-radius: 4px;
+				overflow-x: auto;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Explanation of auth.route.js</h1>
+		<p>
+			This document provides a detailed explanation of each part of the
+			<code>auth.route.js</code> file in your backend.
+		</p>
+
+		<h2>1. Importing Modules</h2>
+		<pre><code>import express from 'express';
+import { signup, login, logout, verifyEmail, forgotPassword, resetPassword, checkAuth } from '../controllers/auth.controller.js';
+import { verifyToken } from '../middleware/verifyToken.js';</code></pre>
+		<ul>
+			<li>
+				<strong>express</strong>: A web framework for Node.js that simplifies
+				building web applications.
+			</li>
+			<li>
+				<strong
+					>signup, login, logout, verifyEmail, forgotPassword, resetPassword,
+					checkAuth</strong
+				>: Functions imported from the <code>auth.controller.js</code> file.
+				These functions handle the logic for each authentication route.
+			</li>
+			<li>
+				<strong>verifyToken</strong>: Middleware imported from the
+				<code>verifyToken.js</code> file. This middleware verifies JWT tokens to
+				ensure that protected routes are only accessible to authenticated users.
+			</li>
+		</ul>
+
+		<h2>2. Initializing Router</h2>
+		<pre><code>const router = express.Router();</code></pre>
+		<p>
+			This line initializes an Express router, which is used to define routes
+			for the authentication system.
+		</p>
+
+		<h2>3. Defining Routes</h2>
+		<pre><code>router.post('/signup', signup);
+router.post('/login', login);
+router.post('/logout', logout);
+router.post('/verify-email', verifyEmail);
+router.post('/forgot-password', forgotPassword);
+router.post('/reset-password/:token', resetPassword);
+router.get('/check-auth', verifyToken, checkAuth);</code></pre>
+		<ul>
+			<li>
+				<code>router.post('/signup', signup)</code>: Defines a POST route for
+				user registration. The <code>signup</code> function handles the logic
+				for this route.
+			</li>
+			<li>
+				<code>router.post('/login', login)</code>: Defines a POST route for user
+				login. The <code>login</code> function handles the logic for this route.
+			</li>
+			<li>
+				<code>router.post('/logout', logout)</code>: Defines a POST route for
+				user logout. The <code>logout</code> function handles the logic for this
+				route.
+			</li>
+			<li>
+				<code>router.post('/verify-email', verifyEmail)</code>: Defines a POST
+				route for email verification. The <code>verifyEmail</code> function
+				handles the logic for this route.
+			</li>
+			<li>
+				<code>router.post('/forgot-password', forgotPassword)</code>: Defines a
+				POST route for requesting a password reset email. The
+				<code>forgotPassword</code> function handles the logic for this route.
+			</li>
+			<li>
+				<code>router.post('/reset-password/:token', resetPassword)</code>:
+				Defines a POST route for resetting the password using a token. The
+				<code>resetPassword</code> function handles the logic for this route.
+			</li>
+			<li>
+				<code>router.get('/check-auth', verifyToken, checkAuth)</code>: Defines
+				a GET route for checking user authentication status. The
+				<code>verifyToken</code> middleware verifies the JWT token, and the
+				<code>checkAuth</code> function handles the logic for this route.
+			</li>
+		</ul>
+
+		<h2>4. Exporting Router</h2>
+		<pre><code>export default router;</code></pre>
+		<p>
+			This line exports the router so that it can be imported and used in other
+			files, such as the main server file.
+		</p>
+
+		<h2>Full Code</h2>
+		<pre><code>import express from 'express';
+import { signup, login, logout, verifyEmail, forgotPassword, resetPassword, checkAuth } from '../controllers/auth.controller.js';
+import { verifyToken } from '../middleware/verifyToken.js';
+
+const router = express.Router();
+
+router.post('/signup', signup);
+router.post('/login', login);
+router.post('/logout', logout);
+router.post('/verify-email', verifyEmail);
+router.post('/forgot-password', forgotPassword);
+router.post('/reset-password/:token', resetPassword);
+router.get('/check-auth', verifyToken, checkAuth);
+
+export default router;</code></pre>
+
+		<h2>Conclusion</h2>
+		<p>
+			This <code>auth.route.js</code> file defines the routes for the
+			authentication system using an Express router. It imports the necessary
+			controller functions and middleware, sets up the routes, and exports the
+			router for use in other parts of the application.
+		</p>
+	</body>
+</html>

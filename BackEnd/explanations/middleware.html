@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>verifyToken.js Explanation</title>
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+				line-height: 1.6;
+				margin: 20px;
+			}
+			h1,
+			h2,
+			h3 {
+				color: #333;
+			}
+			code {
+				background-color: #f4f4f4;
+				padding: 2px 4px;
+				border-radius: 4px;
+			}
+			pre {
+				background-color: #f4f4f4;
+				padding: 10px;
+				border-radius: 4px;
+				overflow-x: auto;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Explanation of verifyToken.js</h1>
+		<p>
+			This document provides a detailed explanation of each part of the
+			<code>verifyToken.js</code> file in your backend.
+		</p>
+
+		<h2>1. Importing Modules</h2>
+		<pre><code>import jwt from "jsonwebtoken";</code></pre>
+		<p>
+			<strong>jsonwebtoken</strong>: A library to work with JSON Web Tokens
+			(JWT). It provides methods to sign, verify, and decode tokens.
+		</p>
+
+		<h2>2. Defining the verifyToken Middleware</h2>
+		<pre><code>export const verifyToken = (req, res, next) => {</code></pre>
+		<p>
+			This line defines a middleware function named <code>verifyToken</code> and
+			exports it so that it can be imported and used in other files. Middleware
+			functions have access to the request and response objects, as well as the
+			next middleware function in the application's request-response cycle.
+		</p>
+
+		<h2>3. Extracting the Token from Cookies</h2>
+		<pre><code>    const token = req.cookies.token;</code></pre>
+		<p>
+			This line extracts the token from the cookies attached to the request
+			object. Cookies are small pieces of data stored on the client-side
+			(browser) that are sent to the server with each request.
+		</p>
+
+		<h2>4. Checking if the Token is Present</h2>
+		<pre><code>    if (!token) {
+        return res.status(401).json({ success: false, message: "Unauthorized - No token provided" });
+    }</code></pre>
+		<p>
+			This block checks if the token is present in the cookies. If not, it
+			returns a 401 Unauthorized response with a message indicating that no
+			token was provided.
+		</p>
+
+		<h2>5. Verifying the Token</h2>
+		<pre><code>    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);</code></pre>
+		<p>
+			This block attempts to verify the token using the secret key stored in the
+			environment variable <code>JWT_SECRET</code>. The
+			<code>jwt.verify</code> method decodes the token and verifies its
+			signature.
+		</p>
+
+		<h2>6. Checking if Decoding was Successful</h2>
+		<pre><code>        if (!decoded) {
+            return res.status(401).json({ success: false, message: "Unauthorized - Invalid Token" });
+        }</code></pre>
+		<p>
+			This block checks if the token was successfully decoded. If not, it
+			returns a 401 Unauthorized response with a message indicating that the
+			token is invalid.
+		</p>
+
+		<h2>7. Attaching User ID to the Request Object</h2>
+		<pre><code>        req.userId = decoded.userId;
+        next();</code></pre>
+		<p>
+			This block attaches the user ID from the decoded token to the request
+			object. This allows subsequent middleware functions and route handlers to
+			access the user ID. The <code>next()</code> function is called to pass
+			control to the next middleware function or route handler.
+		</p>
+
+		<h2>8. Handling Errors</h2>
+		<pre><code>    } catch (error) {
+        console.log("Error in verifyToken", error);
+        return res.status(500).json({
+            success: false,
+            message: "Server Error"
+        });
+    }</code></pre>
+		<p>
+			This block catches any errors that occur during token verification. It
+			logs the error to the console and returns a 500 Internal Server Error
+			response with a message indicating a server error.
+		</p>
+
+		<h2>9. Closing the Function</h2>
+		<pre><code>};</code></pre>
+		<p>This line closes the <code>verifyToken</code> function.</p>
+
+		<h2>Full Code</h2>
+		<pre><code>import jwt from "jsonwebtoken";
+
+// Middleware to verify JWT token from cookies
+export const verifyToken = (req, res, next) => {
+    const token = req.cookies.token;
+
+    // Check if token is present in cookies
+    if (!token) {
+        return res.status(401).json({ success: false, message: "Unauthorized - No token provided" });
+    }
+
+    try {
+        // Verify the token using the JWT secret
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        // Check if decoding was successful
+        if (!decoded) {
+            return res.status(401).json({ success: false, message: "Unauthorized - Invalid Token" });
+        }
+
+        // Attach user ID to the request object for future use
+        req.userId = decoded.userId;
+        next(); // Proceed to the next middleware or route handler
+
+    } catch (error) {
+        // Handle any errors during token verification
+        console.log("Error in verifyToken", error);
+        return res.status(500).json({
+            success: false,
+            message: "Server Error"
+        });
+    }
+};</code></pre>
+
+		<h2>Conclusion</h2>
+		<p>
+			This <code>verifyToken.js</code> file defines a middleware function to
+			verify JWT tokens from cookies. It extracts the token from the cookies,
+			checks if the token is present, verifies the token using a secret key,
+			attaches the user ID to the request object, and handles any errors that
+			occur during token verification.
+		</p>
+	</body>
+</html>

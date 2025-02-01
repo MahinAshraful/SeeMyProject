@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>generateTokenAndSetCookie.js Explanation</title>
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+				line-height: 1.6;
+				margin: 20px;
+			}
+			h1,
+			h2,
+			h3 {
+				color: #333;
+			}
+			code {
+				background-color: #f4f4f4;
+				padding: 2px 4px;
+				border-radius: 4px;
+			}
+			pre {
+				background-color: #f4f4f4;
+				padding: 10px;
+				border-radius: 4px;
+				overflow-x: auto;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Explanation of generateTokenAndSetCookie.js</h1>
+		<p>
+			This document provides a detailed explanation of each part of the
+			<code>generateTokenAndSetCookie.js</code> file in your backend.
+		</p>
+
+		<h2>1. Importing JSON Web Token (JWT)</h2>
+		<pre><code>import jwt from "jsonwebtoken";</code></pre>
+		<p>
+			<strong>jsonwebtoken</strong>: A library to create, sign, and verify JSON
+			Web Tokens (JWTs). JWTs are used for securely transmitting information
+			between parties as a JSON object.
+		</p>
+
+		<h2>2. Defining the generateTokenAndSetCookie Function</h2>
+		<pre><code>export const generateTokenAndSetCookie = (res, userId) => {</code></pre>
+		<p>
+			This line defines a function named
+			<code>generateTokenAndSetCookie</code> and exports it so that it can be
+			imported and used in other files. The function takes two parameters:
+		</p>
+		<ul>
+			<li>
+				<strong>res</strong>: The response object, used to set the cookie.
+			</li>
+			<li>
+				<strong>userId</strong>: The user ID to be included in the JWT payload.
+			</li>
+		</ul>
+
+		<h2>3. Generating the JWT Token</h2>
+		<pre><code>    const token = jwt.sign({ userId }, process.env.JWT_SECRET, {
+        expiresIn: "7d", // Token expiration set to 7 days
+    });</code></pre>
+		<ul>
+			<li>
+				<strong>jwt.sign</strong>: A method to create a new JWT. It takes three
+				arguments:
+				<ul>
+					<li>
+						<strong>Payload</strong>: An object containing the data to be
+						included in the token. Here, it includes the <code>userId</code>.
+					</li>
+					<li>
+						<strong>Secret</strong>: A secret key used to sign the token,
+						retrieved from the environment variable <code>JWT_SECRET</code>.
+					</li>
+					<li>
+						<strong>Options</strong>: An object containing additional options.
+						Here, the <code>expiresIn</code> option sets the token's expiration
+						time to 7 days.
+					</li>
+				</ul>
+			</li>
+		</ul>
+
+		<h2>4. Setting the Token as an HTTP-Only Cookie</h2>
+		<pre><code>    res.cookie("token", token, {
+        httpOnly: true, // Prevents client-side JavaScript from accessing the cookie
+        secure: process.env.NODE_ENV === "production", // Ensure secure flag is only set in production
+        sameSite: "strict", // Strictly limits cookie sharing between sites
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7-day expiration time in milliseconds
+    });</code></pre>
+		<ul>
+			<li>
+				<strong>res.cookie</strong>: A method to set a cookie on the response
+				object. It takes three arguments:
+				<ul>
+					<li>
+						<strong>Name</strong>: The name of the cookie. Here, it is
+						<code>"token"</code>.
+					</li>
+					<li>
+						<strong>Value</strong>: The value of the cookie. Here, it is the
+						generated JWT token.
+					</li>
+					<li>
+						<strong>Options</strong>: An object containing additional options
+						for the cookie:
+						<ul>
+							<li>
+								<strong>httpOnly</strong>: When set to <code>true</code>, it
+								prevents client-side JavaScript from accessing the cookie,
+								providing an additional layer of security.
+							</li>
+							<li>
+								<strong>secure</strong>: When set to <code>true</code>, it
+								ensures the cookie is only sent over HTTPS. This option is
+								enabled only in production environments.
+							</li>
+							<li>
+								<strong>sameSite</strong>: When set to <code>"strict"</code>, it
+								strictly limits cookie sharing between sites, providing
+								additional protection against cross-site request forgery (CSRF)
+								attacks.
+							</li>
+							<li>
+								<strong>maxAge</strong>: The maximum age of the cookie in
+								milliseconds. Here, it is set to 7 days (7 * 24 * 60 * 60 * 1000
+								milliseconds).
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</li>
+		</ul>
+
+		<h2>5. Returning the Token</h2>
+		<pre><code>    return token; // Return the generated token for possible future use
+};</code></pre>
+		<p>
+			This line returns the generated token, which can be used for possible
+			future use, such as sending it in the response body or logging it for
+			debugging purposes.
+		</p>
+
+		<h2>Full Code</h2>
+		<pre><code>import jwt from "jsonwebtoken";
+
+// Function to generate a JWT token and set it as an HTTP-only cookie
+export const generateTokenAndSetCookie = (res, userId) => {
+    // Generate JWT token with userId as payload, secret from environment, and 7-day expiration
+    const token = jwt.sign({ userId }, process.env.JWT_SECRET, {
+        expiresIn: "7d", // Token expiration set to 7 days
+    });
+
+    // Set the token as an HTTP-only cookie with security options
+    res.cookie("token", token, {
+        httpOnly: true, // Prevents client-side JavaScript from accessing the cookie
+        secure: process.env.NODE_ENV === "production", // Ensure secure flag is only set in production
+        sameSite: "strict", // Strictly limits cookie sharing between sites
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7-day expiration time in milliseconds
+    });
+
+    return token; // Return the generated token for possible future use
+};</code></pre>
+
+		<h2>Conclusion</h2>
+		<p>
+			This <code>generateTokenAndSetCookie.js</code> file defines a function to
+			generate a JWT token and set it as an HTTP-only cookie. The function
+			ensures the token is securely stored in the cookie with appropriate
+			options for security and expiration.
+		</p>
+	</body>
+</html>

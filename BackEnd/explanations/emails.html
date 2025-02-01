@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>emails.js Explanation</title>
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+				line-height: 1.6;
+				margin: 20px;
+			}
+			h1,
+			h2,
+			h3 {
+				color: #333;
+			}
+			code {
+				background-color: #f4f4f4;
+				padding: 2px 4px;
+				border-radius: 4px;
+			}
+			pre {
+				background-color: #f4f4f4;
+				padding: 10px;
+				border-radius: 4px;
+				overflow-x: auto;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Explanation of emails.js</h1>
+		<p>
+			This document provides a detailed explanation of each part of the
+			<code>emails.js</code> file in your backend.
+		</p>
+
+		<h2>1. Importing Required Modules</h2>
+		<pre><code>import { mailtrapClient, sender } from "./mailtrap.config.js";</code></pre>
+		<p>
+			This line imports the <code>mailtrapClient</code> and
+			<code>sender</code> from the <code>mailtrap.config.js</code> file. These
+			are used to send emails through Mailtrap.
+		</p>
+
+		<h2>2. Defining the sendVerificationEmail Function</h2>
+		<pre><code>export const sendVerificationEmail = async (to, token) => {</code></pre>
+		<p>
+			This line defines an asynchronous function named
+			<code>sendVerificationEmail</code> and exports it so that it can be
+			imported and used in other files. The function takes two parameters:
+		</p>
+		<ul>
+			<li><strong>to</strong>: The recipient's email address.</li>
+			<li>
+				<strong>token</strong>: The verification token to be included in the
+				email.
+			</li>
+		</ul>
+
+		<h2>3. Constructing the Verification Email</h2>
+		<pre><code>    const message = {
+        from: sender,
+        to,
+        subject: "Verify your email address",
+        html: `<p>Please verify your email address by clicking the link below:</p>
+               <a href="http://localhost:5173/verify-email?token=${token}">Verify Email</a>`,
+    };</code></pre>
+		<ul>
+			<li>
+				<strong>message</strong>: An object representing the email message. It
+				includes the following properties:
+				<ul>
+					<li>
+						<strong>from</strong>: The sender's email address and name, imported
+						from <code>mailtrap.config.js</code>.
+					</li>
+					<li>
+						<strong>to</strong>: The recipient's email address, passed as a
+						parameter to the function.
+					</li>
+					<li><strong>subject</strong>: The subject of the email.</li>
+					<li>
+						<strong>html</strong>: The HTML content of the email, which includes
+						a link to verify the email address. The link contains the
+						verification token as a query parameter.
+					</li>
+				</ul>
+			</li>
+		</ul>
+
+		<h2>4. Sending the Verification Email</h2>
+		<pre><code>    await mailtrapClient.send(message);</code></pre>
+		<p>
+			This line sends the email using the <code>mailtrapClient</code>. The
+			<code>await</code> keyword is used to wait for the email to be sent before
+			proceeding to the next line of code.
+		</p>
+
+		<h2>5. Defining the sendPasswordResetEmail Function</h2>
+		<pre><code>export const sendPasswordResetEmail = async (to, token) => {</code></pre>
+		<p>
+			This line defines an asynchronous function named
+			<code>sendPasswordResetEmail</code> and exports it so that it can be
+			imported and used in other files. The function takes two parameters:
+		</p>
+		<ul>
+			<li><strong>to</strong>: The recipient's email address.</li>
+			<li>
+				<strong>token</strong>: The password reset token to be included in the
+				email.
+			</li>
+		</ul>
+
+		<h2>6. Constructing the Password Reset Email</h2>
+		<pre><code>    const message = {
+        from: sender,
+        to,
+        subject: "Reset your password",
+        html: `<p>Please reset your password by clicking the link below:</p>
+               <a href="http://localhost:5173/reset-password?token=${token}">Reset Password</a>`,
+    };</code></pre>
+		<ul>
+			<li>
+				<strong>message</strong>: An object representing the email message. It
+				includes the following properties:
+				<ul>
+					<li>
+						<strong>from</strong>: The sender's email address and name, imported
+						from <code>mailtrap.config.js</code>.
+					</li>
+					<li>
+						<strong>to</strong>: The recipient's email address, passed as a
+						parameter to the function.
+					</li>
+					<li><strong>subject</strong>: The subject of the email.</li>
+					<li>
+						<strong>html</strong>: The HTML content of the email, which includes
+						a link to reset the password. The link contains the password reset
+						token as a query parameter.
+					</li>
+				</ul>
+			</li>
+		</ul>
+
+		<h2>7. Sending the Password Reset Email</h2>
+		<pre><code>    await mailtrapClient.send(message);
+};</code></pre>
+		<p>
+			This line sends the email using the <code>mailtrapClient</code>. The
+			<code>await</code> keyword is used to wait for the email to be sent before
+			proceeding to the next line of code.
+		</p>
+
+		<h2>Full Code</h2>
+		<pre><code>import { mailtrapClient, sender } from "./mailtrap.config.js";
+
+// Function to send a verification email
+export const sendVerificationEmail = async (to, token) => {
+    const message = {
+        from: sender,
+        to,
+        subject: "Verify your email address",
+        html: `<p>Please verify your email address by clicking the link below:</p>
+               <a href="http://localhost:5173/verify-email?token=${token}">Verify Email</a>`,
+    };
+
+    await mailtrapClient.send(message);
+};
+
+// Function to send a password reset email
+export const sendPasswordResetEmail = async (to, token) => {
+    const message = {
+        from: sender,
+        to,
+        subject: "Reset your password",
+        html: `<p>Please reset your password by clicking the link below:</p>
+               <a href="http://localhost:5173/reset-password?token=${token}">Reset Password</a>`,
+    };
+
+    await mailtrapClient.send(message);
+};</code></pre>
+
+		<h2>Conclusion</h2>
+		<p>
+			This <code>emails.js</code> file defines two functions to send emails
+			using Mailtrap. The <code>sendVerificationEmail</code> function sends a
+			verification email with a link to verify the email address, and the
+			<code>sendPasswordResetEmail</code> function sends a password reset email
+			with a link to reset the password. Both functions use the
+			<code>mailtrapClient</code> to send the emails and include the necessary
+			information in the email messages.
+		</p>
+	</body>
+</html>

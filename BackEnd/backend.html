@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Backend Explanation</title>
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+				line-height: 1.6;
+				margin: 20px;
+			}
+			h1,
+			h2,
+			h3 {
+				color: #333;
+			}
+			code {
+				background-color: #f4f4f4;
+				padding: 2px 4px;
+				border-radius: 4px;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Backend Explanation</h1>
+		<p>
+			This backend is built using <strong>Express</strong> and
+			<strong>MongoDB</strong> to handle user authentication. Below is an
+			overview of how the backend works:
+		</p>
+
+		<h2>1. Server Setup</h2>
+		<p>
+			The server is set up in
+			<code><a href="BackEnd/server.js">server.js</a></code
+			>. It initializes Express, loads environment variables, and sets up
+			middleware for JSON parsing, cookie parsing, and CORS.
+		</p>
+		<ul>
+			<li>
+				<strong>Express</strong>: A web framework for Node.js that simplifies
+				building web applications.
+			</li>
+			<li>
+				<strong>Environment Variables</strong>: Configuration values stored in a
+				file named <code>.env</code> that are loaded using the
+				<code>dotenv</code> package.
+			</li>
+			<li>
+				<strong>Middleware</strong>: Functions that process requests before they
+				reach the route handlers. Examples include JSON parsing and cookie
+				parsing.
+			</li>
+			<li>
+				<strong>CORS</strong>: Cross-Origin Resource Sharing, a security feature
+				that allows or restricts resources on a web server to be requested from
+				another domain.
+			</li>
+		</ul>
+
+		<a href="./explanations/server.html"
+			>Here is a in depth explanation of server.js</a
+		>
+
+		<h2>2. Database Connection</h2>
+		<p>
+			The database connection is established in
+			<code><a href="BackEnd/db/connectDB.js">db/connectDB.js</a></code
+			>. It connects to a MongoDB instance using Mongoose.
+		</p>
+		<ul>
+			<li>
+				<strong>MongoDB</strong>: A NoSQL database that stores data in JSON-like
+				documents.
+			</li>
+			<li>
+				<strong>Mongoose</strong>: An Object Data Modeling (ODM) library for
+				MongoDB and Node.js, which provides a schema-based solution to model
+				data.
+			</li>
+		</ul>
+
+		<a href="./explanations/database.html"
+			>Here is a in depth explanation of connectDB.js</a
+		>
+
+		<h2>3. Routes</h2>
+		<p>
+			All authentication-related routes are defined in
+			<code
+				><a href="BackEnd/routes/auth.route.js">routes/auth.route.js</a></code
+			>. These routes include:
+		</p>
+		<ul>
+			<li><code>POST /api/auth/signup</code>: Register a new user.</li>
+			<li><code>POST /api/auth/login</code>: Login an existing user.</li>
+			<li><code>POST /api/auth/logout</code>: Logout the current user.</li>
+			<li>
+				<code>POST /api/auth/verify-email</code>: Verify user's email using a
+				token.
+			</li>
+			<li>
+				<code>POST /api/auth/forgot-password</code>: Request a password reset
+				email.
+			</li>
+			<li>
+				<code>POST /api/auth/reset-password/:token</code>: Reset password using
+				the reset token.
+			</li>
+			<li>
+				<code>GET /api/auth/check-auth</code>: Check user authentication status
+				(requires token).
+			</li>
+		</ul>
+
+		<a href="./explanations/routes.html"
+			>Here is a in depth explaantion of the routes</a
+		>
+
+		<h2>4. Controllers</h2>
+		<p>
+			The logic for handling each route is implemented in
+			<code
+				><a href="BackEnd/controllers/auth.controller.js"
+					>controllers/auth.controller.js</a
+				></code
+			>. Key controllers include:
+		</p>
+		<ul>
+			<li>
+				<strong>signup</strong>: Handles user registration, including hashing
+				passwords and sending verification emails.
+			</li>
+			<li>
+				<strong>login</strong>: Authenticates users and generates JWT tokens.
+			</li>
+			<li><strong>logout</strong>: Clears the authentication token.</li>
+			<li><strong>verifyEmail</strong>: Verifies user email using a token.</li>
+			<li><strong>forgotPassword</strong>: Sends a password reset email.</li>
+			<li>
+				<strong>resetPassword</strong>: Resets the user's password using a
+				token.
+			</li>
+			<li><strong>checkAuth</strong>: Checks if the user is authenticated.</li>
+		</ul>
+
+		<a href="./explanations/controllers.html"
+			>Here is an in depth explanation of the controller</a
+		>
+
+		<h2>5. Middleware</h2>
+		<p>
+			The
+			<code
+				><a href="BackEnd/middleware/verifyToken.js"
+					>middleware/verifyToken.js</a
+				></code
+			>
+			file contains middleware to verify JWT tokens, ensuring that protected
+			routes are only accessible to authenticated users.
+		</p>
+		<ul>
+			<li>
+				<strong>JWT (JSON Web Token)</strong>: A compact, URL-safe means of
+				representing claims to be transferred between two parties. It is used
+				for securely transmitting information between parties as a JSON object.
+			</li>
+			<li>
+				<strong>Cookies</strong>: Small pieces of data stored on the client-side
+				(browser) that are sent to the server with each request. They are used
+				to maintain session information.
+			</li>
+		</ul>
+
+		<a href="./explanations/middleware.html"
+			>Here is an explanation of the middleware</a
+		>
+
+		<h2>6. Utilities</h2>
+		<p>
+			Utility functions, such as generating tokens and setting cookies, are
+			implemented in
+			<code
+				><a href="BackEnd/utils/generateTokenAndSetCookie.js"
+					>utils/generateTokenAndSetCookie.js</a
+				></code
+			>.
+		</p>
+		<ul>
+			<li>
+				<strong>generateTokenAndSetCookie</strong>: Generates a JWT token and
+				sets it as an HTTP-only cookie. HTTP-only cookies cannot be accessed by
+				JavaScript running on the client-side, providing an additional layer of
+				security.
+			</li>
+		</ul>
+
+		<a href="./explanations/utilities.html"
+			>Here is an explanation of the utilities</a
+		>
+
+		<h2>7. Email Services</h2>
+		<p>
+			Email services for sending verification and password reset emails are
+			handled in
+			<code><a href="BackEnd/mailtrap/emails.js">mailtrap/emails.js</a></code>
+			using Mailtrap.
+		</p>
+		<ul>
+			<li>
+				<strong>Mailtrap</strong>: A service for safe email testing. It captures
+				emails sent from your application and allows you to inspect them without
+				actually sending them to the recipients.
+			</li>
+		</ul>
+
+		<a href="./explanations/emails.html"
+			>Here is an explanation of email services</a
+		>
+
+		<h2>8. Models</h2>
+		<p>
+			The user model is defined in
+			<code
+				><a href="BackEnd/models/user.model.js">models/user.model.js</a></code
+			>
+			using Mongoose, which includes fields for email, password, verification
+			tokens, and more.
+		</p>
+		<ul>
+			<li>
+				<strong>Model</strong>: A representation of a collection of data in the
+				database. It defines the structure of the data and provides methods to
+				interact with the database.
+			</li>
+			<li>
+				<strong>Schema</strong>: A blueprint for the model, defining the
+				structure, types, and validation rules for the data.
+			</li>
+		</ul>
+
+		<a href="./explanations/models.html"
+			>Here is an in depth explaantion of models</a
+		>
+
+		<h2>Conclusion</h2>
+		<p>
+			This backend provides a robust authentication system with features like
+			user registration, login, email verification, password reset, and
+			token-based authentication.
+		</p>
+	</body>
+</html>

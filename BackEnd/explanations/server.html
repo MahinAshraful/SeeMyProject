@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Server.js Explanation</title>
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+				line-height: 1.6;
+				margin: 20px;
+			}
+			h1,
+			h2,
+			h3 {
+				color: #333;
+			}
+			code {
+				background-color: #f4f4f4;
+				padding: 2px 4px;
+				border-radius: 4px;
+			}
+			pre {
+				background-color: #f4f4f4;
+				padding: 10px;
+				border-radius: 4px;
+				overflow-x: auto;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Explanation of server.js</h1>
+		<p>
+			This document provides a detailed explanation of each part of the
+			<code>server.js</code> file in your backend.
+		</p>
+
+		<h2>1. Importing Modules</h2>
+		<pre><code>import express from 'express';
+import dotenv from "dotenv";
+import cookieParser from 'cookie-parser';
+import cors from "cors";
+import { connectDB } from "./db/connectDB.js";
+import authRoutes from "./routes/auth.route.js";
+import path from "path";</code></pre>
+		<ul>
+			<li>
+				<strong>express</strong>: A web framework for Node.js that simplifies
+				building web applications.
+			</li>
+			<li>
+				<strong>dotenv</strong>: A module that loads environment variables from
+				a <code>.env</code> file into <code>process.env</code>.
+			</li>
+			<li>
+				<strong>cookieParser</strong>: A middleware to parse cookies attached to
+				the client request object.
+			</li>
+			<li>
+				<strong>cors</strong>: A middleware to enable Cross-Origin Resource
+				Sharing (CORS), which allows your server to accept requests from
+				different origins.
+			</li>
+			<li>
+				<strong>connectDB</strong>: A function to establish a connection to the
+				MongoDB database, imported from
+				<code><a href="BackEnd/db/connectDB.js">db/connectDB.js</a></code
+				>.
+			</li>
+			<li>
+				<strong>authRoutes</strong>: The authentication routes, imported from
+				<code
+					><a href="BackEnd/routes/auth.route.js">routes/auth.route.js</a></code
+				>.
+			</li>
+			<li>
+				<strong>path</strong>: A Node.js module for working with file and
+				directory paths.
+			</li>
+		</ul>
+
+		<h2>2. Loading Environment Variables</h2>
+		<pre><code>dotenv.config();</code></pre>
+		<p>
+			This line loads environment variables from a <code>.env</code> file into
+			<code>process.env</code>. This is useful for storing configuration values
+			like database connection strings and API keys.
+		</p>
+
+		<h2>3. Initializing Express Application</h2>
+		<pre><code>const app = express();
+const PORT = process.env.PORT || 5000; // Use port from environment or default to 5000
+const __dirname = path.resolve();</code></pre>
+		<ul>
+			<li><strong>app</strong>: An instance of the Express application.</li>
+			<li>
+				<strong>PORT</strong>: The port number on which the server will listen.
+				It uses the value from the environment variable <code>PORT</code> or
+				defaults to 5000 if not specified.
+			</li>
+			<li>
+				<strong>__dirname</strong>: The absolute path to the directory
+				containing the <code>server.js</code> file.
+			</li>
+		</ul>
+
+		<h2>4. Setting Up Middleware</h2>
+		<pre><code>app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+
+// Middleware to parse JSON and cookies
+app.use(express.json());
+app.use(cookieParser());</code></pre>
+		<ul>
+			<li>
+				<strong>cors</strong>: Enables CORS with specific options. Here, it
+				allows requests from <code>http://localhost:5173</code> and includes
+				credentials (cookies, authorization headers, etc.).
+			</li>
+			<li>
+				<strong>express.json()</strong>: A middleware to parse incoming requests
+				with JSON payloads.
+			</li>
+			<li>
+				<strong>cookieParser</strong>: A middleware to parse cookies attached to
+				the client request object.
+			</li>
+		</ul>
+
+		<h2>5. Setting Up Routes</h2>
+		<pre><code>app.use("/api/auth", authRoutes);</code></pre>
+		<p>
+			This line sets up the authentication routes under the
+			<code>/api/auth</code> path. All routes defined in
+			<code
+				><a href="BackEnd/routes/auth.route.js">routes/auth.route.js</a></code
+			>
+			will be accessible under this path.
+		</p>
+
+		<h2>6. Serving Static Files in Production</h2>
+		<pre><code>if (process.env.NODE_ENV === "production") {
+    app.use(express.static(path.join(__dirname, "/frontend/dist")));
+    app.get("*", (req, res) => {
+        res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
+    });
+}</code></pre>
+		<ul>
+			<li>
+				<strong>process.env.NODE_ENV</strong>: An environment variable that
+				indicates the environment in which the application is running (e.g.,
+				development, production).
+			</li>
+			<li>
+				<strong>express.static</strong>: A middleware to serve static files from
+				the specified directory. Here, it serves files from the
+				<code>/frontend/dist</code> directory.
+			</li>
+			<li>
+				<strong>app.get("*", ...)</strong>: A catch-all route that sends the
+				<code>index.html</code> file for any request that doesn't match an
+				existing route. This is useful for single-page applications (SPAs) that
+				handle routing on the client side.
+			</li>
+		</ul>
+
+		<h2>7. Starting the Server and Connecting to the Database</h2>
+		<pre><code>app.listen(PORT, () => {
+    connectDB(); // Establish connection to MongoDB
+    console.log(`Server is running on port ${PORT}`);
+});</code></pre>
+		<ul>
+			<li>
+				<strong>app.listen(PORT, ...)</strong>: Starts the server and listens
+				for incoming requests on the specified port.
+			</li>
+			<li>
+				<strong>connectDB()</strong>: Calls the function to establish a
+				connection to the MongoDB database.
+			</li>
+			<li>
+				<strong>console.log(...)</strong>: Logs a message to the console
+				indicating that the server is running and on which port.
+			</li>
+		</ul>
+
+		<h2>Conclusion</h2>
+		<p>
+			This <code>server.js</code> file sets up an Express server with middleware
+			for JSON parsing, cookie parsing, and CORS. It defines routes for
+			authentication, serves static files in production, and connects to a
+			MongoDB database. The server listens on a specified port and logs a
+			message when it starts successfully.
+		</p>
+	</body>
+</html>

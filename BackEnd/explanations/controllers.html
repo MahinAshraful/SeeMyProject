@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>auth.controller.js Explanation</title>
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+				line-height: 1.6;
+				margin: 20px;
+			}
+			h1,
+			h2,
+			h3 {
+				color: #333;
+			}
+			code {
+				background-color: #f4f4f4;
+				padding: 2px 4px;
+				border-radius: 4px;
+			}
+			pre {
+				background-color: #f4f4f4;
+				padding: 10px;
+				border-radius: 4px;
+				overflow-x: auto;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Explanation of auth.controller.js</h1>
+		<p>
+			This document provides a detailed explanation of each part of the
+			<code>auth.controller.js</code> file in your backend.
+		</p>
+
+		<h2>1. Importing Modules</h2>
+		<pre><code>import User from '../models/user.model.js';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import { sendEmail } from '../mailtrap/emails.js';
+import crypto from 'crypto';</code></pre>
+		<ul>
+			<li>
+				<strong>User</strong>: The user model imported from
+				<code>user.model.js</code>. This model is used to interact with the user
+				data in the MongoDB database.
+			</li>
+			<li>
+				<strong>bcrypt</strong>: A library for hashing passwords. It is used to
+				securely store user passwords.
+			</li>
+			<li>
+				<strong>jwt</strong>: A library for creating and verifying JSON Web
+				Tokens (JWT). JWTs are used for user authentication.
+			</li>
+			<li>
+				<strong>sendEmail</strong>: A function imported from
+				<code>emails.js</code> that is used to send emails, such as verification
+				and password reset emails.
+			</li>
+			<li>
+				<strong>crypto</strong>: A Node.js module that provides cryptographic
+				functionality, including generating random tokens.
+			</li>
+		</ul>
+
+		<h2>2. Signup Function</h2>
+		<pre><code>export const signup = async (req, res) => {
+    const { email, password } = req.body;
+    try {
+        const userExists = await User.findOne({ email });
+        if (userExists) {
+            return res.status(400).json({ message: 'User already exists' });
+        }
+        const hashedPassword = await bcrypt.hash(password, 12);
+        const user = await User.create({ email, password: hashedPassword });
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        res.cookie('token', token, { httpOnly: true });
+        res.status(201).json({ message: 'User registered successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+};</code></pre>
+		<ul>
+			<li>
+				<strong>signup</strong>: An asynchronous function that handles user
+				registration.
+			</li>
+			<li>
+				<strong>req.body</strong>: Contains the email and password sent in the
+				request body.
+			</li>
+			<li>
+				<strong>User.findOne({ email })</strong>: Checks if a user with the
+				given email already exists in the database.
+			</li>
+			<li>
+				<strong>bcrypt.hash(password, 12)</strong>: Hashes the user's password
+				with a salt factor of 12.
+			</li>
+			<li>
+				<strong>User.create({ email, password: hashedPassword })</strong>:
+				Creates a new user in the database with the hashed password.
+			</li>
+			<li>
+				<strong
+					>jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h'
+					})</strong
+				>: Generates a JWT token that expires in 1 hour.
+			</li>
+			<li>
+				<strong>res.cookie('token', token, { httpOnly: true })</strong>: Sets
+				the JWT token as an HTTP-only cookie.
+			</li>
+			<li>
+				<strong
+					>res.status(201).json({ message: 'User registered successfully'
+					})</strong
+				>: Sends a success response with a message.
+			</li>
+			<li>
+				<strong>res.status(500).json({ message: 'Server error' })</strong>:
+				Sends an error response if there is a server error.
+			</li>
+		</ul>
+
+		<h2>3. Login Function</h2>
+		<pre><code>export const login = async (req, res) => {
+    const { email, password } = req.body;
+    try {
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(400).json({ message: 'User not found' });
+        }
+        const isPasswordCorrect = await bcrypt.compare(password, user.password);
+        if (!isPasswordCorrect) {
+            return res.status(400).json({ message: 'Invalid credentials' });
+        }
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        res.cookie('token', token, { httpOnly: true });
+        res.status(200).json({ message: 'Logged in successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+};</code></pre>
+		<ul>
+			<li>
+				<strong>login</strong>: An asynchronous function that handles user
+				login.
+			</li>
+			<li>
+				<strong>User.findOne({ email })</strong>: Finds a user with the given
+				email in the database.
+			</li>
+			<li>
+				<strong>bcrypt.compare(password, user.password)</strong>: Compares the
+				provided password with the hashed password stored in the database.
+			</li>
+			<li>
+				<strong
+					>jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h'
+					})</strong
+				>: Generates a JWT token that expires in 1 hour.
+			</li>
+			<li>
+				<strong>res.cookie('token', token, { httpOnly: true })</strong>: Sets
+				the JWT token as an HTTP-only cookie.
+			</li>
+			<li>
+				<strong
+					>res.status(200).json({ message: 'Logged in successfully' })</strong
+				>: Sends a success response with a message.
+			</li>
+			<li>
+				<strong>res.status(500).json({ message: 'Server error' })</strong>:
+				Sends an error response if there is a server error.
+			</li>
+		</ul>
+
+		<h2>4. Logout Function</h2>
+		<pre><code>export const logout = (req, res) => {
+    res.clearCookie('token');
+    res.status(200).json({ message: 'Logged out successfully' });
+};</code></pre>
+		<ul>
+			<li><strong>logout</strong>: A function that handles user logout.</li>
+			<li>
+				<strong>res.clearCookie('token')</strong>: Clears the JWT token cookie.
+			</li>
+			<li>
+				<strong
+					>res.status(200).json({ message: 'Logged out successfully' })</strong
+				>: Sends a success response with a message.
+			</li>
+		</ul>
+
+		<h2>5. Verify Email Function</h2>
+		<pre><code>export const verifyEmail = async (req, res) => {
+    const { token } = req.body;
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const user = await User.findById(decoded.id);
+        if (!user) {
+            return res.status(400).json({ message: 'Invalid token' });
+        }
+        user.isVerified = true;
+        await user.save();
+        res.status(200).json({ message: 'Email verified successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+};</code></pre>
+		<ul>
+			<li>
+				<strong>verifyEmail</strong>: An asynchronous function that handles
+				email verification.
+			</li>
+			<li>
+				<strong>jwt.verify(token, process.env.JWT_SECRET)</strong>: Verifies the
+				JWT token.
+			</li>
+			<li>
+				<strong>User.findById(decoded.id)</strong>: Finds the user by the ID
+				decoded from the token.
+			</li>
+			<li>
+				<strong>user.isVerified = true</strong>: Sets the user's
+				<code>isVerified</code> field to <code>true</code>.
+			</li>
+			<li>
+				<strong>user.save()</strong>: Saves the updated user to the database.
+			</li>
+			<li>
+				<strong
+					>res.status(200).json({ message: 'Email verified successfully'
+					})</strong
+				>: Sends a success response with a message.
+			</li>
+			<li>
+				<strong>res.status(500).json({ message: 'Server error' })</strong>:
+				Sends an error response if there is a server error.
+			</li>
+		</ul>
+
+		<h2>6. Forgot Password Function</h2>
+		<pre><code>export const forgotPassword = async (req, res) => {
+    const { email } = req.body;
+    try {
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(400).json({ message: 'User not found' });
+        }
+        const resetToken = crypto.randomBytes(32).toString('hex');
+        user.resetPasswordToken = resetToken;
+        user.resetPasswordExpire = Date.now() + 3600000; // 1 hour
+        await user.save();
+        const resetUrl = `http://localhost:5173/reset-password/${resetToken}`;
+        await sendEmail({
+            to: user.email,
+            subject: 'Password Reset Request',
+            text: `You requested a password reset. Please go to this link to reset your password: ${resetUrl}`
+        });
+        res.status(200).json({ message: 'Password reset email sent' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+};</code></pre>
+		<ul>
+			<li>
+				<strong>forgotPassword</strong>: An asynchronous function that handles
+				password reset requests.
+			</li>
+			<li>
+				<strong>User.findOne({ email })</strong>: Finds a user with the given
+				email in the database.
+			</li>
+			<li>
+				<strong>crypto.randomBytes(32).toString('hex')</strong>: Generates a
+				random token for password reset.
+			</li>
+			<li>
+				<strong>user.resetPasswordToken = resetToken</strong>: Sets the user's
+				password reset token.
+			</li>
+			<li>
+				<strong>user.resetPasswordExpire = Date.now() + 3600000</strong>: Sets
+				the token expiration time to 1 hour.
+			</li>
+			<li>
+				<strong>user.save()</strong>: Saves the updated user to the database.
+			</li>
+			<li>
+				<strong>sendEmail({ ... })</strong>: Sends a password reset email to the
+				user.
+			</li>
+			<li>
+				<strong
+					>res.status(200).json({ message: 'Password reset email sent'
+					})</strong
+				>: Sends a success response with a message.
+			</li>
+			<li>
+				<strong>res.status(500).json({ message: 'Server error' })</strong>:
+				Sends an error response if there is a server error.
+			</li>
+		</ul>
+
+		<h2>7. Reset Password Function</h2>
+		<pre><code>export const resetPassword = async (req, res) => {
+    const { token } = req.params;
+    const { password } = req.body;
+    try {
+        const user = await User.findOne({
+            resetPasswordToken: token,
+            resetPasswordExpire: { $gt: Date.now() }
+        });
+        if (!user) {
+            return res.status(400).json({ message: 'Invalid or expired token' });
+        }
+        user.password = await bcrypt.hash(password, 12);
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpire = undefined;
+        await user.save();
+        res.status(200).json({ message: 'Password reset successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+};</code></pre>
+		<ul>
+			<li>
+				<strong>resetPassword</strong>: An asynchronous function that handles
+				password resets.
+			</li>
+			<li>
+				<strong>req.params.token</strong>: The password reset token from the
+				request parameters.
+			</li>
+			<li>
+				<strong>User.findOne({ ... })</strong>: Finds a user with the given
+				reset token and checks if the token has not expired.
+			</li>
+			<li>
+				<strong>bcrypt.hash(password, 12)</strong>: Hashes the new password with
+				a salt factor of 12.
+			</li>
+			<li>
+				<strong>user.resetPasswordToken = undefined</strong>: Clears the
+				password reset token.
+			</li>
+			<li>
+				<strong>user.resetPasswordExpire = undefined</strong>: Clears the token
+				expiration time.
+			</li>
+			<li>
+				<strong>user.save()</strong>: Saves the updated user to the database.
+			</li>
+			<li>
+				<strong
+					>res.status(200).json({ message: 'Password reset successfully'
+					})</strong
+				>: Sends a success response with a message.
+			</li>
+			<li>
+				<strong>res.status(500).json({ message: 'Server error' })</strong>:
+				Sends an error response if there is a server error.
+			</li>
+		</ul>
+
+		<h2>8. Check Auth Function</h2>
+		<pre><code>export const checkAuth = (req, res) => {
+    res.status(200).json({ message: 'Authenticated', user: req.user });
+};</code></pre>
+		<ul>
+			<li>
+				<strong>checkAuth</strong>: A function that checks if the user is
+				authenticated.
+			</li>
+			<li>
+				<strong
+					>res.status(200).json({ message: 'Authenticated', user: req.user
+					})</strong
+				>: Sends a success response with a message and the authenticated user's
+				information.
+			</li>
+		</ul>
+
+		<h2>Full Code</h2>
+		<pre><code>import User from '../models/user.model.js';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import { sendEmail } from '../mailtrap/emails.js';
+import crypto from 'crypto';
+
+export const signup = async (req, res) => {
+    const { email, password } = req.body;
+    try {
+        const userExists = await User.findOne({ email });
+        if (userExists) {
+            return res.status(400).json({ message: 'User already exists' });
+        }
+        const hashedPassword = await bcrypt.hash(password, 12);
+        const user = await User.create({ email, password: hashedPassword });
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        res.cookie('token', token, { httpOnly: true });
+        res.status(201).json({ message: 'User registered successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+export const login = async (req, res) => {
+    const { email, password } = req.body;
+    try {
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(400).json({ message: 'User not found' });
+        }
+        const isPasswordCorrect = await bcrypt.compare(password, user.password);
+        if (!isPasswordCorrect) {
+            return res.status(400).json({ message: 'Invalid credentials' });
+        }
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        res.cookie('token', token, { httpOnly: true });
+        res.status(200).json({ message: 'Logged in successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+export const logout = (req, res) => {
+    res.clearCookie('token');
+    res.status(200).json({ message: 'Logged out successfully' });
+};
+
+export const verifyEmail = async (req, res) => {
+    const { token } = req.body;
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const user = await User.findById(decoded.id);
+        if (!user) {
+            return res.status(400).json({ message: 'Invalid token' });
+        }
+        user.isVerified = true;
+        await user.save();
+        res.status(200).json({ message: 'Email verified successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+export const forgotPassword = async (req, res) => {
+    const { email } = req.body;
+    try {
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(400).json({ message: 'User not found' });
+        }
+        const resetToken = crypto.randomBytes(32).toString('hex');
+        user.resetPasswordToken = resetToken;
+        user.resetPasswordExpire = Date.now() + 3600000; // 1 hour
+        await user.save();
+        const resetUrl = `http://localhost:5173/reset-password/${resetToken}`;
+        await sendEmail({
+            to: user.email,
+            subject: 'Password Reset Request',
+            text: `You requested a password reset. Please go to this link to reset your password: ${resetUrl}`
+        });
+        res.status(200).json({ message: 'Password reset email sent' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+export const resetPassword = async (req, res) => {
+    const { token } = req.params;
+    const { password } = req.body;
+    try {
+        const user = await User.findOne({
+            resetPasswordToken: token,
+            resetPasswordExpire: { $gt: Date.now() }
+        });
+        if (!user) {
+            return res.status(400).json({ message: 'Invalid or expired token' });
+        }
+        user.password = await bcrypt.hash(password, 12);
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpire = undefined;
+        await user.save();
+        res.status(200).json({ message: 'Password reset successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+export const checkAuth = (req, res) => {
+    res.status(200).json({ message: 'Authenticated', user: req.user });
+};</code></pre>
+
+		<h2>Conclusion</h2>
+		<p>
+			This <code>auth.controller.js</code> file defines the logic for handling
+			authentication-related routes. It includes functions for user
+			registration, login, logout, email verification, password reset requests,
+			password resets, and checking user authentication status.
+		</p>
+	</body>
+</html>
