@@ -54,39 +54,24 @@ const Home = () => {
       try {
         console.log('Sending request with email:', user?.email); 
         
-        const response = await axios.post('http://127.0.0.1:5000/get-input', finalData, {
+        const response = await axios.post('http://127.0.0.1:5000/get-json', finalData, {
           headers: {
             'Content-Type': 'application/json'
           },
           withCredentials: false
         });
         
-        console.log('API Response:', response.data);
-        setApiResponse(response.data);
+        // Extract and parse JSON from markdown string
+        const jsonString = response.data.json
+          .replace('```json\n', '')  // Remove opening markdown
+          .replace('\n```', '');     // Remove closing markdown
         
-        // Create clean JSON string with proper formatting
-        const jsonString = JSON.stringify(response.data, null, 2);
-        const blob = new Blob([jsonString], {
-          type: 'application/json;charset=utf-8'
-        });
-        
-        // Create download link
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        const fileName = data.projectName.toLowerCase().replace(/\s+/g, '_');
-        link.download = `${fileName}_workflow.json`;
-        
-        // Trigger download
-        document.body.appendChild(link);
-        link.click();
-        
-        // Cleanup
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(url);
-        
-        // Navigate to dashboard after download
-        navigate('/dashboard');
+        const parsedJson = JSON.parse(jsonString);
+        console.log('Parsed JSON:', parsedJson);
+        setApiResponse(parsedJson);
+
+        // Navigate with state
+        navigate('/project', { state: { workflow: parsedJson } });
       } catch (error) {
         if (error.response) {
           console.error('Server Error:', error.response.data.error);
