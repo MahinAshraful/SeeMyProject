@@ -2,7 +2,7 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from dotenv import load_dotenv
 import os
-import openai
+from openai import OpenAI
 import boto3
 import json
 import uuid
@@ -25,7 +25,7 @@ s3 = boto3.client(
 BUCKET_NAME = os.getenv("AWS_BUCKET_NAME")
 
 # Initialize OpenAI client
-openai.api_key = os.getenv("OPENAI_API_KEY")
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 
 def generate_system_design(user_input):
@@ -63,7 +63,7 @@ def generate_system_design(user_input):
 
     try:
         # Call OpenAI API with structured prompt
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
                 {
@@ -79,7 +79,7 @@ def generate_system_design(user_input):
         )
 
         # Extract and return the JSON content
-        return response.choices[0].message["content"]
+        return response.choices[0].message.content
 
     except Exception as e:
         return f"Error generating workflow: {str(e)}"
