@@ -62,7 +62,7 @@ const TempProject = () => {
         )}
 
         {/* Navigation Buttons */}
-        <div className="p-8  bg-black/80">
+        <div className="p-8 bg-black/80">
           <div className="flex justify-center max-w-4xl gap-8 mx-auto">
             <button
               onClick={() => navigate('/home')}
@@ -76,12 +76,7 @@ const TempProject = () => {
             >
               VIEW ALL PROJECTS
             </button>
-            <button
-              onClick={() => navigate('/dashboard')}
-              className="px-6 py-3 text-black transition-all duration-300 bg-pink-400 arcade-btn pixel-corners hover:bg-pink-300"
-            >
-              GO TO DASHBOARD
-            </button>
+            
           </div>
         </div>
       </div>
