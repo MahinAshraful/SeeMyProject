@@ -13,6 +13,7 @@ import LoadingSpinner from "./components/LoadingSpinner";
 import { Toaster } from "react-hot-toast";
 import { useAuthStore } from "./store/authStore";
 import { useEffect } from "react";
+import Home from "./pages/Old-Home";
 
 // protect routes that require authentication
 const ProtectedRoute = ({ children }) => {
@@ -51,8 +52,7 @@ function App() {
 
 	return (
 		<div
-			className='min-h-screen bg-gradient-to-br
-    from-gray-900 via-blue-900 to-sky-900 flex items-center justify-center relative overflow-hidden'
+			className='relative flex items-center justify-center min-h-screen overflow-hidden bg-gradient-to-br from-gray-900 via-blue-900 to-sky-900'
 		>
 			<FloatingShape color='bg-blue-500' size='w-64 h-64' top='-5%' left='10%' delay={0} />
 			<FloatingShape color='bg-sky-500' size='w-48 h-48' top='70%' left='80%' delay={5} />
@@ -63,7 +63,7 @@ function App() {
 					path='/'
 					element={
 						<ProtectedRoute>
-							<DashboardPage />
+							<Home />
 						</ProtectedRoute>
 					}
 				/>
