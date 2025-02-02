@@ -86,7 +86,7 @@ const Home = () => {
         window.URL.revokeObjectURL(url);
         
         // Navigate to dashboard after download
-        navigate('/dashboard');
+        navigate('/project');
       } catch (error) {
         if (error.response) {
           console.error('Server Error:', error.response.data.error);
