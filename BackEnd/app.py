@@ -81,6 +81,7 @@ def create_workflow():
         return jsonify({"workflow": workflow})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+        pass
 
 
 if __name__ == "__main__":
