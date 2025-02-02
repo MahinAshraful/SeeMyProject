@@ -36,8 +36,8 @@ def generate_system_design(user_input):
     Project Context:
     - Description: {user_input['project_description']}
     - Core technologies: {', '.join(user_input['technologies'])}
-    - New technologies to learn: {', '.join(user_input['new_technologies'])}
-    - Additional features: {user_input['additional_info']}
+    - New technologies used in this project: {', '.join(user_input['new_technologies'])}
+    - Additional info: {user_input['additional_info']}
     
     Generate an array of workflow cards where each card follows this exact structure:
     {{
@@ -52,13 +52,12 @@ def generate_system_design(user_input):
     }}
 
     Requirements:
-    1. Learning cards (type: "learn") should have no dependencies and come first
-    2. Build cards should depend on relevant learning cards
-    3. Deployment cards should come last in the workflow
-    4. Each card should have realistic time estimates
-    5. Include specific implementation details and resources
+    1. Be specific dont just say learn this technology
+    2. Pay attention to what they already know and dont know
+    3. Build cards should depend on relevant learning cards
+    5. Include specific implementation details and unqieu resources
     6. Ensure proper dependency chains between cards
-    7. Return only the JSON array without any additional text
+    7. ONLY Return only the JSON array without any additional text
     """
 
     try:
