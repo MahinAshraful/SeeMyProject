@@ -14,6 +14,7 @@ import { Toaster } from "react-hot-toast";
 import { useAuthStore } from "./store/authStore";
 import { useEffect } from "react";
 import Home from "./pages/Home";
+import Landing from "./pages/landing";
 
 // protect routes that require authentication
 const ProtectedRoute = ({ children }) => {
@@ -51,14 +52,14 @@ function App() {
 	if (isCheckingAuth) return <LoadingSpinner />;
 
 	return (
-			<div className="relative min-h-screen overflow-hidden bg-black">
+			<div className="relative min-h-screen bg-black">
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
         
         body {
           font-family: 'Press Start 2P', cursive;
           background: #000;
-          overflow: hidden;
+          
         }
         .neon-border {
           box-shadow: 0 0 10px #FFFF00, 0 0 20px #FFFF00, 0 0 30px #FFFF00;
