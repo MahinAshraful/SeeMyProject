@@ -66,10 +66,12 @@ def generate_system_design(user_input):
     Requirements:
     1. Be specific dont just say learn this technology
     2. Pay attention to what they already know and dont know
-    3. Build cards should depend on relevant learning cards
-    5. Include specific implementation details and unqieu resources
-    6. Ensure proper dependency chains between cards
-    7. ONLY Return only the JSON array without any additional text
+    3. You may use relevant technologies from the project context
+    4. Include 1-2 resources for each card
+    5. Each catergory(frontend, backend, database, deployment) must have at least 1 card
+    6. Include specific implementation details and unqiue resources
+    7. Ensure proper dependency chains between cards
+    8. ONLY Return only the JSON array without any additional text
     """
 
     try:
@@ -134,6 +136,15 @@ def generate():
             print(f"Error updating links for {user_email}: {e}")
 
     return jsonify({"s3_link": file_url})
+
+@app.route("/get-json", methods=["POST"])
+def generate_json():
+    user_input = request.json
+    user_email = user_input.get("userEmail")
+
+    # Generate and upload to S3 as before
+    system_design = generate_system_design(user_input)
+    return jsonify({"json": system_design})
 
 
 if __name__ == "__main__":
