@@ -13,7 +13,7 @@ import LoadingSpinner from "./components/LoadingSpinner";
 import { Toaster } from "react-hot-toast";
 import { useAuthStore } from "./store/authStore";
 import { useEffect } from "react";
-import Home from "./pages/Old-Home";
+import Home from "./pages/Home";
 
 // protect routes that require authentication
 const ProtectedRoute = ({ children }) => {
@@ -61,12 +61,12 @@ function App() {
           overflow: hidden;
         }
         .neon-border {
-          box-shadow: 0 0 10px #0ff, 0 0 20px #0ff, 0 0 30px #0ff;
+          box-shadow: 0 0 10px #FFFF00, 0 0 20px #FFFF00, 0 0 30px #FFFF00;
           animation: neon 1.5s ease-in-out infinite alternate;
         }
         @keyframes neon {
-          from { box-shadow: 0 0 10px #0ff, 0 0 20px #0ff, 0 0 30px #0ff; }
-          to { box-shadow: 0 0 5px #0ff, 0 0 10px #0ff, 0 0 15px #0ff; }
+          from { box-shadow: 0 0 10px #FFFF00, 0 0 20px #FFFF00, 0 0 30px #FFFF00; }
+          to { box-shadow: 0 0 5px #FFFF00, 0 0 10px #FFFF00, 0 0 15px #FFFF00; }
         }
         .pixel-corners {
           clip-path: polygon(
@@ -78,28 +78,34 @@ function App() {
             10px calc(100% - 10px), 0 calc(100% - 10px)
           );
         }
-        .stars {
+        .pac-dot {
           position: absolute;
-          width: 1px;
-          height: 1px;
-          background: white;
+          width: 4px;
+          height: 4px;
+          background: #FFFF00;
+          border-radius: 50%;
           z-index: 0;
+          animation: blink 0.5s ease-in-out infinite alternate;
+        }
+        @keyframes blink {
+          from { opacity: 1; }
+          to { opacity: 0.5; }
         }
       `}</style>
 
-      <FloatingShape color='neon-border bg-cyan-500/20' size='w-64 h-64' top='-5%' left='10%' delay={0} />
-      <FloatingShape color='neon-border bg-cyan-500/20' size='w-48 h-48' top='70%' left='80%' delay={5} />
-      <FloatingShape color='neon-border bg-cyan-500/20' size='w-32 h-32' top='40%' left='-10%' delay={2} />
+      <FloatingShape color='bg-red-500/20' size='w-64 h-64' top='-5%' left='10%' delay={0} />
+      <FloatingShape color='bg-pink-500/20' size='w-48 h-48' top='70%' left='80%' delay={5} />
+      <FloatingShape color='bg-blue-500/20' size='w-32 h-32' top='40%' left='-10%' delay={2} />
 
-      <div className="absolute inset-0 stars-container">
-        {[...Array(100)].map((_, i) => (
+      <div className="absolute inset-0">
+        {[...Array(50)].map((_, i) => (
           <div
             key={i}
-            className="stars"
+            className="pac-dot"
             style={{
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
-              animationDuration: `${Math.random() * 3 + 1}s`
+              animationDelay: `${Math.random() * 2}s`
             }}
           />
         ))}
@@ -158,8 +164,8 @@ function App() {
           toastOptions={{
             style: {
               background: '#000',
-              color: '#0ff',
-              border: '2px solid #0ff',
+              color: '#FFFF00',
+              border: '2px solid #FFFF00',
               fontFamily: '"Press Start 2P", cursive',
             },
           }}
