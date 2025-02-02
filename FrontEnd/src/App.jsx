@@ -51,14 +51,62 @@ function App() {
 	if (isCheckingAuth) return <LoadingSpinner />;
 
 	return (
-		<div
-			className='relative flex items-center justify-center min-h-screen overflow-hidden bg-gradient-to-br from-gray-900 via-blue-900 to-sky-900'
-		>
-			<FloatingShape color='bg-blue-500' size='w-64 h-64' top='-5%' left='10%' delay={0} />
-			<FloatingShape color='bg-sky-500' size='w-48 h-48' top='70%' left='80%' delay={5} />
-			<FloatingShape color='bg-lime-500' size='w-32 h-32' top='40%' left='-10%' delay={2} />
+			<div className="relative min-h-screen overflow-hidden bg-black">
+      <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        
+        body {
+          font-family: 'Press Start 2P', cursive;
+          background: #000;
+          overflow: hidden;
+        }
+        .neon-border {
+          box-shadow: 0 0 10px #0ff, 0 0 20px #0ff, 0 0 30px #0ff;
+          animation: neon 1.5s ease-in-out infinite alternate;
+        }
+        @keyframes neon {
+          from { box-shadow: 0 0 10px #0ff, 0 0 20px #0ff, 0 0 30px #0ff; }
+          to { box-shadow: 0 0 5px #0ff, 0 0 10px #0ff, 0 0 15px #0ff; }
+        }
+        .pixel-corners {
+          clip-path: polygon(
+            0 10px, 10px 10px, 10px 0,
+            calc(100% - 10px) 0, calc(100% - 10px) 10px,
+            100% 10px, 100% calc(100% - 10px),
+            calc(100% - 10px) calc(100% - 10px),
+            calc(100% - 10px) 100%, 10px 100%,
+            10px calc(100% - 10px), 0 calc(100% - 10px)
+          );
+        }
+        .stars {
+          position: absolute;
+          width: 1px;
+          height: 1px;
+          background: white;
+          z-index: 0;
+        }
+      `}</style>
 
-			<Routes>
+      <FloatingShape color='neon-border bg-cyan-500/20' size='w-64 h-64' top='-5%' left='10%' delay={0} />
+      <FloatingShape color='neon-border bg-cyan-500/20' size='w-48 h-48' top='70%' left='80%' delay={5} />
+      <FloatingShape color='neon-border bg-cyan-500/20' size='w-32 h-32' top='40%' left='-10%' delay={2} />
+
+      <div className="absolute inset-0 stars-container">
+        {[...Array(100)].map((_, i) => (
+          <div
+            key={i}
+            className="stars"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDuration: `${Math.random() * 3 + 1}s`
+            }}
+          />
+        ))}
+      </div>
+
+      <div className="relative z-10">
+        <Routes>
 				<Route
 					path='/'
 					element={
@@ -79,7 +127,9 @@ function App() {
 					path='/login'
 					element={
 						<RedirectAuthenticatedUser>
+							<div className="flex items-center justify-center h-screen">
 							<LoginPage />
+							</div>
 						</RedirectAuthenticatedUser>
 					}
 				/>
@@ -104,8 +154,18 @@ function App() {
 				{/* catch all routes */}
 				<Route path='*' element={<Navigate to='/' replace />} />
 			</Routes>
-			<Toaster />
-		</div>
+        <Toaster 
+          toastOptions={{
+            style: {
+              background: '#000',
+              color: '#0ff',
+              border: '2px solid #0ff',
+              fontFamily: '"Press Start 2P", cursive',
+            },
+          }}
+        />
+      </div>
+    </div>
 	);
 }
 
