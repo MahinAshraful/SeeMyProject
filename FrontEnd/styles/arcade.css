@@ -1,0 +1,48 @@
+.pixel-corners {
+    clip-path: polygon(0 4px, 4px 4px, 4px 0,
+            calc(100% - 4px) 0, calc(100% - 4px) 4px,
+            100% 4px, 100% calc(100% - 4px),
+            calc(100% - 4px) calc(100% - 4px),
+            calc(100% - 4px) 100%, 4px 100%,
+            4px calc(100% - 4px), 0 calc(100% - 4px));
+}
+
+.arcade-base {
+    box-shadow: 0 4px 0 #000;
+}
+
+.joystick {
+    box-shadow: 0 2px 0 #000;
+    transition: transform 0.2s ease-out;
+}
+
+.pixel-text {
+    font-family: 'Press Start 2P', monospace;
+    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
+}
+
+@keyframes chomp-right {
+    0% {
+        clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 0 50%);
+    }
+
+    25% {
+        clip-path: polygon(0 0, 100% 35%, 100% 65%, 0 100%, 0 50%);
+    }
+
+    50% {
+        clip-path: polygon(0 0, 100% 50%, 100% 50%, 0 100%, 0 50%);
+    }
+
+    75% {
+        clip-path: polygon(0 0, 100% 35%, 100% 65%, 0 100%, 0 50%);
+    }
+
+    100% {
+        clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 0 50%);
+    }
+}
+
+.animate-chomp-right {
+    animation: chomp-right 0.4s linear infinite;
+}

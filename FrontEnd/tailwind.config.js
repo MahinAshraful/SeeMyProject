@@ -51,6 +51,39 @@ export default {
           5: "hsl(var(--chart-5))",
         },
       },
+      animation: {
+        'chomp-right': 'chomp-right 0.4s linear infinite',
+        'task-eaten': 'task-eaten 0.3s ease-out forwards',
+        'ghost-float': 'ghost-float 2s ease-in-out infinite',
+      },
+      keyframes: {
+        'chomp-right': {
+          '0%, 100%': { 
+            clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%, 0 50%)' 
+          },
+          '50%': { 
+            clipPath: 'polygon(0 0, 100% 50%, 100% 50%, 0 100%, 0 50%)' 
+          },
+        },
+        'task-eaten': {
+          '0%': { 
+            transform: 'scale(1)',
+            opacity: '1' 
+          },
+          '100%': { 
+            transform: 'scale(0)',
+            opacity: '0' 
+          },
+        },
+        'ghost-float': {
+          '0%, 100%': { 
+            transform: 'translateY(0)' 
+          },
+          '50%': { 
+            transform: 'translateY(-10px)' 
+          },
+        },
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],
