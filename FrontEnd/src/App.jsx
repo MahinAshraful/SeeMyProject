@@ -17,6 +17,7 @@ import Home from "./pages/Home";
 import Project from "./pages/Project";
 import Landing from "./pages/landing";
 import Navbar from "./components/Navbar";
+import TempProject from "./pages/tempProject";
 
 // protect routes that require authentication
 const ProtectedRoute = ({ children }) => {
@@ -66,7 +67,7 @@ function App() {
     if (isCheckingAuth) return <LoadingSpinner />;
 
     return (
-        <div className="relative min-h-screen overflow-hidden bg-black">
+        <div className="relative min-h-screen bg-black">
             <style jsx global>{`
                 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
                 
@@ -154,7 +155,9 @@ function App() {
                         path='/signup'
                         element={
                             <RedirectAuthenticatedUser>
+								<div className="flex items-center justify-center h-screen mt-12">
                                 <SignUpPage />
+								</div>
                             </RedirectAuthenticatedUser>
                         }
                     />
@@ -187,6 +190,14 @@ function App() {
                             </ProtectedRoute>
                         }
                     />
+					<Route
+						path='/temp-project'
+						element={
+						<ProtectedRoute>
+							<TempProject />
+						</ProtectedRoute>
+						}
+					/>
 
 					<Route
 						path='/home'

@@ -167,7 +167,8 @@ def generate():
             except Exception as e:
                 print(f"Error updating links for {user_email}: {e}")
 
-        return jsonify({"s3_link": file_url})
+        return jsonify({"s3_link": file_url,
+                        "system_design": system_design})
 
     except Exception as e:
         print("Error in generate endpoint:", str(e))
