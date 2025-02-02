@@ -8,6 +8,7 @@ const Home = () => {
   const [currentTech, setCurrentTech] = useState("");
   const [showTechInput, setShowTechInput] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [apiResponse, setApiResponse] = useState(null);
   const { register, handleSubmit, formState: { errors }, watch } = useForm();
 
   const handleAddTechnology = () => {
@@ -28,8 +29,13 @@ const Home = () => {
 
     setIsLoading(true);
     const finalData = {
-      ...data,
-      technologies
+      project_name: data.projectName,
+      project_description: data.projectDescription,
+      technologies: technologies,
+      new_technologies: technologies,
+      target_industry: "Finance",
+      target_audience: "Young adults",
+      additional_info: ""
     };
 
     try {
@@ -40,8 +46,20 @@ const Home = () => {
         withCredentials: false
       });
       console.log('API Response:', response.data);
+      setApiResponse(response.data);
     } catch (error) {
-      console.error('Error submitting form:', error);
+      if (error.response) {
+        // Server responded with error
+        console.error('Server Error:', error.response.data.error);
+        alert(error.response.data.error);
+      } else if (error.request) {
+        // Request made but no response
+        console.error('Network Error');
+        alert('Network error - please check if the server is running');
+      } else {
+        console.error('Error:', error.message);
+        alert('An error occurred');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -144,44 +162,59 @@ const Home = () => {
   return (
     <div className="min-h-screen px-4 py-12 bg-gray-100 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
-        <div className="p-8 bg-white rounded-lg shadow-xl">
-          <h1 className="mb-8 text-3xl font-bold text-center text-gray-800">
-            Let's Design Your Project
-          </h1>
-          
-          {/* Progress Bar */}
-          <div className="w-full h-2 mb-8 bg-gray-200 rounded-full">
-            <div 
-              className="h-full transition-all duration-300 bg-blue-500 rounded-full" 
-              style={{ width: `${(step / 3) * 100}%` }}
-            ></div>
+        {apiResponse ? (
+          <div className="p-8 mb-8 bg-white rounded-lg shadow-xl">
+            <h2 className="mb-4 text-2xl font-bold text-gray-800">Your Project Blueprint</h2>
+            <pre className="p-4 overflow-auto rounded-md bg-gray-50">
+              {JSON.stringify(apiResponse, null, 2)}
+            </pre>
+            <button
+              onClick={() => setApiResponse(null)}
+              className="px-4 py-2 mt-4 text-white bg-blue-600 rounded-md hover:bg-blue-700"
+            >
+              Start New Project
+            </button>
           </div>
-
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-            {renderStep()}
-
-            <div className="flex justify-between mt-8">
-              {step > 1 && (
-                <button
-                  type="button"
-                  onClick={prevStep}
-                  className="px-4 py-2 text-blue-600 border border-blue-600 rounded-md hover:bg-blue-50"
-                >
-                  Previous
-                </button>
-              )}
-              <button
-                type="submit"
-                disabled={isLoading}
-                className={`px-4 py-2 ml-auto text-white rounded-md ${
-                  isLoading ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'
-                }`}
-              >
-                {isLoading ? 'Processing...' : step === 3 ? 'Generate Blueprint' : 'Next'}
-              </button>
+        ) : (
+          <div className="p-8 bg-white rounded-lg shadow-xl">
+            <h1 className="mb-8 text-3xl font-bold text-center text-gray-800">
+              Let's Design Your Project
+            </h1>
+            
+            {/* Progress Bar */}
+            <div className="w-full h-2 mb-8 bg-gray-200 rounded-full">
+              <div 
+                className="h-full transition-all duration-300 bg-blue-500 rounded-full" 
+                style={{ width: `${(step / 3) * 100}%` }}
+              ></div>
             </div>
-          </form>
-        </div>
+
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+              {renderStep()}
+
+              <div className="flex justify-between mt-8">
+                {step > 1 && (
+                  <button
+                    type="button"
+                    onClick={prevStep}
+                    className="px-4 py-2 text-blue-600 border border-blue-600 rounded-md hover:bg-blue-50"
+                  >
+                    Previous
+                  </button>
+                )}
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className={`px-4 py-2 ml-auto text-white rounded-md ${
+                    isLoading ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'
+                  }`}
+                >
+                  {isLoading ? 'Processing...' : step === 3 ? 'Generate Blueprint' : 'Next'}
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
       </div>
     </div>
   );
