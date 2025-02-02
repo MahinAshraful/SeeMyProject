@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Project = () => {
+  const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [leftJoystickPos, setLeftJoystickPos] = useState({ x: 0, y: 0 });
@@ -66,23 +67,26 @@ const Project = () => {
           <div className="w-full max-w-2xl p-6 bg-gray-800 pixel-corners">
             <h2 className="mb-4 text-2xl text-white">{selectedItem.name}</h2>
             <p className="mb-4 text-gray-300">{selectedItem.description}</p>
-            <button
-              onClick={() => setIsModalOpen(false)}
-              className="px-4 py-2 text-white bg-gray-600 pixel-corners hover:bg-gray-500"
-            >
-              Close
-            </button>
+            
+            <div className="flex gap-4">
+              {selectedItem.name === "New Project" && (
+                <button
+                  onClick={() => navigate('/home')}
+                  className="px-4 py-2 text-white bg-blue-600 pixel-corners hover:bg-blue-500"
+                >
+                  Let me try this new project
+                </button>
+              )}
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="px-4 py-2 text-white bg-gray-600 pixel-corners hover:bg-gray-500"
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}
-
-      {/* Home Button */}
-      <Link
-        to="/home"
-        className="fixed flex items-center justify-center w-20 h-20 bg-green-500 rounded-full bottom-8 right-8 arcade-btn hover:bg-green-400 pixel-corners"
-      >
-        <div className="text-4xl text-center text-white">8</div>
-      </Link>
 
       <style jsx>{`
         .pixel-corners {

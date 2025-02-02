@@ -188,6 +188,15 @@ function App() {
                         }
                     />
 
+					<Route
+						path='/home'
+						element={
+							<ProtectedProjectRoute>
+							<Home />
+							</ProtectedProjectRoute>
+						}
+						/>
+
                     <Route
                         path='/reset-password/:token'
                         element={
