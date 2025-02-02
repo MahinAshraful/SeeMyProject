@@ -70,6 +70,13 @@ def generate_system_design(user_input):
     5. Include specific implementation details and unqieu resources
     6. Ensure proper dependency chains between cards
     7. ONLY Return only the JSON array without any additional text
+
+    Make sure to follow these guidelines for the JSON structure:
+    Double Quotes for Keys: All keys (e.g., "id", "name", "technologies") must be enclosed in double quotes.
+    Double Quotes for String Values: All string values (e.g., "Node.js", "frontend") must be enclosed in double quotes. This includes strings within arrays.
+    No Trailing Commas: In objects, there should be no trailing comma after the last key-value pair. Similarly, in arrays, there should be no trailing comma after the last element.
+    Valid Data Types: JSON supports strings, numbers, booleans, arrays, and objects. Make sure your data conforms to these types.
+    Proper Nesting: Arrays and objects can be nested within each other, but they must be properly structured. Square brackets [] denote arrays, and curly braces denote objects.
     """
 
     try:
