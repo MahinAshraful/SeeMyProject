@@ -1,7 +1,10 @@
-
 import { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
-const Project = ({ workflow }) => {
+const Project = () => {
+  const location = useLocation();
+  const workflow = location.state?.workflow || [];
+  const navigate = useNavigate();
 
   const [selectedItem, setSelectedItem] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -110,6 +113,15 @@ const Project = ({ workflow }) => {
           </div>
         </div>
       )}
+
+      <div className="flex justify-center mt-8">
+        <button
+          onClick={() => navigate('/')}
+          className="px-6 py-3 text-lg font-bold tracking-wider text-black uppercase transition-all duration-300 bg-yellow-400 arcade-btn pixel-corners hover:bg-yellow-300"
+        >
+          Make Another Project
+        </button>
+      </div>
     </div>
   );
 };
