@@ -54,7 +54,7 @@ function App() {
 	if (isCheckingAuth) return <LoadingSpinner />;
 
 	return (
-		<div className="relative min-h-screen overflow-hidden bg-black">
+		<div className="relative min-h-screen bg-black">
 			<style jsx global>{`
 				@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 				
@@ -134,72 +134,31 @@ function App() {
 			<div className="relative z-10">
 				<Navbar/>
 				<Routes>
-					<Route
-						path='/'
-						element={
-							<ProtectedRoute>
-								<Home />
-							</ProtectedRoute>
-						}
-					/>
-					<Route
-						path='/signup'
-						element={
-							<RedirectAuthenticatedUser>
-								<SignUpPage />
-							</RedirectAuthenticatedUser>
-						}
-					/>
-					<Route
-						path='/login'
-						element={
-							<RedirectAuthenticatedUser>
-								<div className="flex items-center justify-center h-screen">
-								<LoginPage />
-								</div>
-							</RedirectAuthenticatedUser>
-						}
-					/>
+					<Route path='/' element={<Landing />} />
+					{/* Protected Routes - require authentication */}
+					<Route path='/home' element={<ProtectedRoute><Home /></ProtectedRoute>} />
+					<Route path='/dashboard' element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+					<Route path='/project' element={<ProtectedRoute><Project /></ProtectedRoute>} />
+
+					{/* Public Routes - redirect if authenticated */}
+					<Route path='/signup' element={<RedirectAuthenticatedUser>
+						<div className="flex items-center justify-center h-screen mt-14">
+						<SignUpPage />
+						</div>
+						</RedirectAuthenticatedUser>} />
+					<Route path='/login' element={<RedirectAuthenticatedUser>
+						<div className="flex items-center justify-center h-screen">
+						<LoginPage />
+						</div>
+						</RedirectAuthenticatedUser>} />
+					<Route path='/forgot-password' element={<RedirectAuthenticatedUser><ForgotPasswordPage /></RedirectAuthenticatedUser>} />
+					<Route path='/reset-password/:token' element={<RedirectAuthenticatedUser><ResetPasswordPage /></RedirectAuthenticatedUser>} />
+
+					{/* Semi-protected - only for unverified users */}
 					<Route path='/verify-email' element={<EmailVerificationPage />} />
-					<Route
-						path='/forgot-password'
-						element={
-							<RedirectAuthenticatedUser>
-								<ForgotPasswordPage />
-							</RedirectAuthenticatedUser>
-						}
-					/>
 
-					
-					<Route
-						path='/dashboard'
-						element={
-							<ProtectedRoute>
-								<DashboardPage />
-							</ProtectedRoute>
-						}
-					/>
-
-					<Route
-						path='/reset-password/:token'
-						element={
-							<RedirectAuthenticatedUser>
-								<ResetPasswordPage />
-							</RedirectAuthenticatedUser>
-						}
-					/>
-					<Route
-						path='/project/:id'
-						element={
-							<RedirectAuthenticatedUser>
-								<Project />
-							</RedirectAuthenticatedUser>
-						}
-					/>
-					{/* catch all routes */}
+					{/* Catch all */}
 					<Route path='*' element={<Navigate to='/' replace />} />
-
-
 				</Routes>
 				<Toaster 
 					toastOptions={{

@@ -24,7 +24,7 @@ const Landing = () => {
         {/* Hero */}
         <section className="flex items-center justify-center min-h-[70vh] px-4">
           <div className="text-center">
-            <h1 className="mb-6 text-4xl text-yellow-400 md:text-6xl neon-text">
+            <h1 className="mb-6 text-4xl text-yellow-400 md:text-6xl">
               SEE MY PROJECT
             </h1>
             <p className="mb-8 text-xl text-cyan-400">
