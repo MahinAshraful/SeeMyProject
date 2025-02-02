@@ -23,13 +23,13 @@ const Home = () => {
   const prevStep = () => setStep(step - 1);
 
   const onSubmit = async (data) => {
-    if (step !== 4) {
+    if (step !== 5) {
       nextStep();
       return;
     }
 
     // Only proceed with API call if on final step
-    if (step === 4) {
+    if (step === 5) {
       setIsLoading(true);
       const finalData = {
         project_name: data.projectName,
@@ -38,11 +38,11 @@ const Home = () => {
         new_technologies: unfamiliarTech,
         target_industry: "Finance",
         target_audience: "Young adults",
-        additional_info: ""
+        additional_info: data.additionalInfo
       };
 
       try {
-        const response = await axios.post('http://127.0.0.1:5000/get-input', finalData, {
+        const response = await axios.post('http://127.0.0.1:5002/get-input', finalData, {
           headers: {
             'Content-Type': 'application/json'
           },
@@ -227,6 +227,20 @@ const Home = () => {
             </div>
           </div>
         );
+      case 5:
+        return (
+          <div>
+            <label className="block mb-2 text-lg font-medium text-yellow-300">
+              Additional Details
+            </label>
+            <textarea
+              {...register("additionalInfo")}
+              className="w-full p-3 text-white bg-black border-2 border-pink-400 focus:outline-none focus:border-cyan-400 pixel-corners"
+              rows="4"
+              placeholder="Enter any additional information"
+            />
+          </div>
+        );
       default:
         return null;
     }
@@ -328,7 +342,7 @@ const Home = () => {
             <div className="w-full h-4 mb-8 overflow-hidden bg-blue-900 rounded-full pixel-corners">
               <div 
                 className="h-full transition-all duration-300 pac-progress" 
-                style={{ width: `${(step / 4) * 100}%` }}
+                style={{ width: `${(step / 5) * 100}%` }}
               ></div>
             </div>
 
@@ -352,7 +366,7 @@ const Home = () => {
                     isLoading ? 'bg-gray-700 text-gray-300' : 'bg-yellow-400 text-black hover:bg-yellow-300'
                   }`}
                 >
-                  {isLoading ? 'PROCESSING...' : step === 4 ? 'GENERATE' : 'NEXT'}
+                  {isLoading ? 'PROCESSING...' : step === 5 ? 'SUBMIT' : 'NEXT'}
                 </button>
               </div>
             </form>
