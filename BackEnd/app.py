@@ -174,5 +174,21 @@ def generate():
         return jsonify({"error": str(e)}), 500
 
 
+@app.route("/api/links", methods=["GET"])
+def get_user_links():
+    user_email = request.args.get("email")
+    if not user_email:
+        return jsonify({"error": "Email is required"}), 400
+
+    try:
+        user_doc = db.links.find_one({"email": user_email})
+        if user_doc and "links" in user_doc:
+            return jsonify({"links": user_doc["links"]})
+        return jsonify({"links": []})
+    except Exception as e:
+        print(f"Error fetching links for {user_email}: {e}")
+        return jsonify({"error": "Failed to fetch links"}), 500
+
+
 if __name__ == "__main__":
     app.run(debug=True)

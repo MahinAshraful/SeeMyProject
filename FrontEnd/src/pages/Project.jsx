@@ -1,26 +1,76 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Project = () => {
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isProjectsModalOpen, setIsProjectsModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [leftJoystickPos, setLeftJoystickPos] = useState({ x: 0, y: 0 });
   const [rightJoystickPos, setRightJoystickPos] = useState({ x: 0, y: 0 });
+  const [projects, setProjects] = useState([]);
+  const [selectedProjectData, setSelectedProjectData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (isProjectsModalOpen) {
+      fetchUserProjects();
+    }
+  }, [isProjectsModalOpen]);
+
+  const fetchUserProjects = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      // Update this URL to match your Flask server
+      const response = await fetch('http://127.0.0.1:5000/api/links?email=mahinashraful08@gmail.com');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      console.log('Received data:', data); // Debug log
+      setProjects(data.links || []);
+    } catch (error) {
+      console.error('Error fetching projects:', error);
+      setError('Failed to load projects. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchProjectData = async (url) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      setSelectedProjectData(data);
+    } catch (error) {
+      console.error('Error fetching project data:', error);
+      setError('Failed to load project data. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleItemClick = (item, isLeft) => {
-    setSelectedItem(item);
-    setIsModalOpen(true);
-    
     if (isLeft) {
+      setIsProjectsModalOpen(true);
       setLeftJoystickPos({ x: -5, y: -5 });
       setTimeout(() => setLeftJoystickPos({ x: 0, y: 0 }), 200);
     } else {
+      setSelectedItem(item);
+      setIsModalOpen(true);
       setRightJoystickPos({ x: -5, y: -5 });
       setTimeout(() => setRightJoystickPos({ x: 0, y: 0 }), 200);
     }
   };
 
+  // Same JSX as before, but with error handling added to the Projects List Modal
   return (
     <div className="container relative w-full h-screen p-4 mx-auto">
       <div className="fixed bottom-0 left-0 right-0 flex justify-between p-8">
@@ -61,7 +111,63 @@ const Project = () => {
         </button>
       </div>
 
-      {/* Modal */}
+      {/* Projects List Modal */}
+      {isProjectsModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center p-4 bg-black/50">
+          <div className="w-full max-w-4xl p-6 overflow-hidden bg-gray-800 pixel-corners">
+            <div className="flex justify-between mb-4">
+              <h2 className="text-2xl text-white">My Projects</h2>
+              <button
+                onClick={() => {
+                  setIsProjectsModalOpen(false);
+                  setSelectedProjectData(null);
+                  setError(null);
+                }}
+                className="px-3 py-1 text-white bg-gray-600 pixel-corners hover:bg-gray-500"
+              >
+                Close
+              </button>
+            </div>
+            
+            {loading && (
+              <div className="text-white">Loading...</div>
+            )}
+
+            {error && (
+              <div className="p-4 mb-4 text-white bg-red-500/50 pixel-corners">
+                {error}
+              </div>
+            )}
+
+            {!loading && !error && projects.length === 0 && (
+              <div className="text-white">No projects found.</div>
+            )}
+
+            <div className="grid grid-cols-1 gap-4 mb-4">
+              {projects.map((url, index) => (
+                <button
+                  key={index}
+                  onClick={() => fetchProjectData(url)}
+                  className="p-4 text-left text-white transition-colors bg-gray-700 pixel-corners hover:bg-gray-600"
+                >
+                  Project {index + 1}
+                </button>
+              ))}
+            </div>
+
+            {selectedProjectData && (
+              <div className="mt-4">
+                <h3 className="mb-2 text-xl text-white">Project Data:</h3>
+                <pre className="p-4 overflow-auto text-sm text-white bg-gray-900 pixel-corners max-h-96">
+                  {JSON.stringify(selectedProjectData, null, 2)}
+                </pre>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* New Project Modal */}
       {isModalOpen && selectedItem && (
         <div className="fixed inset-0 flex items-center justify-center p-4 bg-black/50">
           <div className="w-full max-w-2xl p-6 bg-gray-800 pixel-corners">
@@ -78,7 +184,10 @@ const Project = () => {
                 </button>
               )}
               <button
-                onClick={() => setIsModalOpen(false)}
+                onClick={() => {
+                  setIsModalOpen(false);
+                  setSelectedItem(null);
+                }}
                 className="px-4 py-2 text-white bg-gray-600 pixel-corners hover:bg-gray-500"
               >
                 Close
