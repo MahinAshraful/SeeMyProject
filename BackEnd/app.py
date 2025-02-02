@@ -78,7 +78,8 @@ def create_workflow():
     try:
         user_input = request.get_json()
         workflow = generate_system_design(user_input)
-        return jsonify({"workflow": workflow})
+        
+        return workflow
     except Exception as e:
         return jsonify({"error": str(e)}), 500
         pass
