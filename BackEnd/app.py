@@ -6,11 +6,23 @@ from openai import OpenAI
 import boto3
 import json
 import uuid
+from pymongo import MongoClient
+from datetime import datetime
+import certifi
 
-# Load environment variables and setup
-load_dotenv()
+# Initialize Flask app
 app = Flask(__name__)
 CORS(app)
+
+# Load environment variables
+load_dotenv()
+
+# Connect to MongoDB using your env variables
+MONGO_URI = os.getenv("MONGO_URI")
+client = MongoClient(MONGO_URI, tlsCAFile=certifi.where())
+
+# Test connection
+db = client.test
 
 # Initialize S3 client
 s3 = boto3.client(
@@ -25,7 +37,7 @@ s3 = boto3.client(
 BUCKET_NAME = os.getenv("AWS_BUCKET_NAME")
 
 # Initialize OpenAI client
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 
 def generate_system_design(user_input):
@@ -62,7 +74,7 @@ def generate_system_design(user_input):
 
     try:
         # Call OpenAI API with structured prompt
-        response = client.chat.completions.create(
+        response = openai_client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
                 {
@@ -103,9 +115,24 @@ def upload_to_s3(file_content, file_name):
 @app.route("/get-input", methods=["POST"])
 def generate():
     user_input = request.json
+    user_email = user_input.get("userEmail")
+
+    # Generate and upload to S3 as before
     system_design = generate_system_design(user_input)
     file_name = f"system_design_{uuid.uuid4()}.json"
     file_url = upload_to_s3(system_design, file_name)
+
+    # Add just the URL string to user's links array
+    if user_email:
+        try:
+            db.links.update_one(
+                {"email": user_email},
+                {"$push": {"links": file_url}},  # Correct syntax: push to 'links' array
+            )
+            print(f"Successfully added link for user: {user_email}")
+        except Exception as e:
+            print(f"Error updating links for {user_email}: {e}")
+
     return jsonify({"s3_link": file_url})
 
 

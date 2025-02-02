@@ -2,8 +2,14 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useAuthStore } from '../store/authStore';
+
+
 
 const Home = () => {
+
+  const { user } = useAuthStore();
+  console.log('email:', user?.email);
 
   const navigate = useNavigate();
 
@@ -28,70 +34,74 @@ const Home = () => {
 
   const onSubmit = async (data) => {
     if (step !== 5) {
+
       nextStep();
       return;
     }
 
     // Only proceed with API call if on final step
     if (step === 5) {
-        setIsLoading(true);
-        const finalData = {
-          project_name: data.projectName,
-          project_description: data.projectDescription,
-          technologies: technologies,
-          new_technologies: unfamiliarTech,
-          additional_info: data.additionalInfo
-        };
+      setIsLoading(true);
+      const finalData = {
+        project_name: data.projectName,
+        project_description: data.projectDescription,
+        technologies: technologies,
+        new_technologies: unfamiliarTech,
+        additional_info: data.additionalInfo,
+        userEmail: user?.email  // Add email from the top-level hook
+      };
 
-        try {
-          const response = await axios.post('http://127.0.0.1:5000/get-input', finalData, {
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            withCredentials: false
-          });
-          
-          console.log('API Response:', response.data);
-          setApiResponse(response.data);
-
-          // Create clean JSON string with proper formatting
-          const jsonString = JSON.stringify(response.data, null, 2);
-          const blob = new Blob([jsonString], { 
-            type: 'application/json;charset=utf-8'
-          });
-          
-          // Create download link
-          const url = window.URL.createObjectURL(blob);
-          const link = document.createElement('a');
-          link.href = url;
-          const fileName = data.projectName.toLowerCase().replace(/\s+/g, '_');
-          link.download = `${fileName}_workflow.json`;
-          
-          // Trigger download
-          document.body.appendChild(link);
-          link.click();
-          
-          // Cleanup
-          document.body.removeChild(link);
-          window.URL.revokeObjectURL(url);
-
-          // Navigate to dashboard after download
-          navigate('/dashboard');
-        } catch (error) {
-          if (error.response) {
-            console.error('Server Error:', error.response.data.error);
-            alert(error.response.data.error);
-          } else if (error.request) {
-            console.error('Network Error');
-            alert('Network error - please check if the server is running');
-          } else {
-            console.error('Error:', error.message);
-            alert('An error occurred');
-          }
-        } finally {
-          setIsLoading(false);
+      try {
+        console.log('Sending request with email:', user?.email); 
+        
+        const response = await axios.post('http://127.0.0.1:5000/get-input', finalData, {
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          withCredentials: false
+        });
+        
+        console.log('API Response:', response.data);
+        setApiResponse(response.data);
+        
+        // Create clean JSON string with proper formatting
+        const jsonString = JSON.stringify(response.data, null, 2);
+        const blob = new Blob([jsonString], {
+          type: 'application/json;charset=utf-8'
+        });
+        
+        // Create download link
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        const fileName = data.projectName.toLowerCase().replace(/\s+/g, '_');
+        link.download = `${fileName}_workflow.json`;
+        
+        // Trigger download
+        document.body.appendChild(link);
+        link.click();
+        
+        // Cleanup
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+        
+        // Navigate to dashboard after download
+        navigate('/dashboard');
+      } catch (error) {
+        if (error.response) {
+          console.error('Server Error:', error.response.data.error);
+          alert(error.response.data.error);
+        } else if (error.request) {
+          console.error('Network Error');
+          alert('Network error - please check if the server is running');
+        } else {
+          console.error('Error:', error.message);
+          alert('An error occurred');
         }
+      } finally {
+        setIsLoading(false);
       }
+    }
   };
 
   const createStars = () => {
