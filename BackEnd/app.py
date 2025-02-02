@@ -41,70 +41,85 @@ openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 
 def generate_system_design(user_input):
-    # Structured prompt for OpenAI
-    prompt = f"""
-    Create a detailed development workflow for {user_input['project_name']} as a structured JSON array.
-    
-    Project Context:
-    - Description: {user_input['project_description']}
-    - Core technologies: {', '.join(user_input['technologies'])}
-    - New technologies used in this project: {', '.join(user_input['new_technologies'])}
-    - Additional info: {user_input['additional_info']}
-    
-    Generate an array of workflow cards where each card follows this exact structure:
-    {{
-        "id": "unique_string",
-        "name": "component/task name",
-        "type": "learn" | "build" | "deploy",
-        "description": "detailed description of the task",
-        "technologies": ["specific technologies needed"],
-        "dependencies": ["ids of prerequisite cards"],
-        "category": "frontend" | "backend" | "database" | "deployment",
-        "resources": ["relevant documentation links or learning resources"]
-    }}
-
-    Requirements:
-    1. Be specific dont just say learn this technology
-    2. Pay attention to what they already know and dont know
-    3. Build cards should depend on relevant learning cards
-    5. Include specific implementation details and unqieu resources
-    6. Ensure proper dependency chains between cards
-    7. ONLY Return only the JSON array without any additional text
-
-    Make sure to follow these guidelines for the JSON structure:
-    Double Quotes for Keys: All keys (e.g., "id", "name", "technologies") must be enclosed in double quotes.
-    Double Quotes for String Values: All string values (e.g., "Node.js", "frontend") must be enclosed in double quotes. This includes strings within arrays.
-    No Trailing Commas: In objects, there should be no trailing comma after the last key-value pair. Similarly, in arrays, there should be no trailing comma after the last element.
-    Valid Data Types: JSON supports strings, numbers, booleans, arrays, and objects. Make sure your data conforms to these types.
-    Proper Nesting: Arrays and objects can be nested within each other, but they must be properly structured. Square brackets [] denote arrays, and curly braces denote objects.
-    """
+    print("Generating system design for:", json.dumps(user_input, indent=2))
 
     try:
-        # Call OpenAI API with structured prompt
+        # Structured prompt for OpenAI
+        prompt = f"""
+        Create a detailed development workflow for {user_input['project_name']} as a structured JSON array.
+        
+        Project Context:
+        - Description: {user_input['project_description']}
+        - Core technologies: {', '.join(user_input['technologies'])}
+        - New technologies used in this project: {', '.join(user_input['new_technologies'])}
+        - Additional info: {user_input['additional_info']}
+        
+        Generate an array of workflow cards where each card follows this exact structure:
+        {{
+            "id": "unique_string",
+            "name": "component/task name",
+            "type": "learn" | "build" | "deploy",
+            "description": "detailed description of the task",
+            "technologies": ["specific technologies needed"],
+            "dependencies": ["ids of prerequisite cards"],
+            "category": "frontend" | "backend" | "database" | "deployment",
+            "resources": ["relevant documentation links or learning resources"]
+        }}
+
+        IMPORTANT: Return ONLY the raw JSON array without any markdown formatting or code blocks.
+        DO NOT include ```json or ``` markers. The response should be pure, valid JSON.
+        """
+
+        print("Calling OpenAI API...")
         response = openai_client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
                 {
                     "role": "system",
-                    "content": "You are a system design expert specialized in creating detailed technical workflows. Structure all responses as valid JSON arrays with comprehensive implementation details.",
+                    "content": "You are a system design expert. You must return ONLY raw JSON without any markdown formatting or code blocks. No ```json markers or any other decorators.",
                 },
                 {"role": "user", "content": prompt},
             ],
-            temperature=0.2,  # Lower temperature for more consistent, structured outputs
-            max_tokens=4000,  # Ensure enough space for detailed workflows
-            presence_penalty=0.1,  # Slight penalty to prevent repetition
-            frequency_penalty=0.1,  # Slight penalty to encourage diverse technology suggestions
+            temperature=0.2,
+            max_tokens=4000,
+            presence_penalty=0.1,
+            frequency_penalty=0.1,
         )
 
-        # Extract and return the JSON content
-        return response.choices[0].message.content
+        content = response.choices[0].message.content.strip()
+        print(
+            "OpenAI Response received:", content[:200] + "..."
+        )  # Print first 200 chars
+
+        # Remove any potential markdown code block markers
+        if content.startswith("```"):
+            content = content.split("```")[1]
+            if content.startswith("json"):
+                content = content[4:]
+        content = content.strip()
+
+        # Validate JSON
+        try:
+            json.loads(content)  # Validate JSON structure
+            print("Response is valid JSON")
+            return content
+        except json.JSONDecodeError as e:
+            print("Invalid JSON received:", str(e))
+            print("Raw content:", content)
+            return None
 
     except Exception as e:
-        return f"Error generating workflow: {str(e)}"
+        print("Error in generate_system_design:", str(e))
+        return None
 
 
 def upload_to_s3(file_content, file_name):
+    if not file_content:
+        print("No content to upload")
+        return None
+
     try:
+        print(f"Uploading to S3... Content length: {len(file_content)}")
         s3.put_object(
             Bucket=BUCKET_NAME,
             Key=file_name,
@@ -115,32 +130,48 @@ def upload_to_s3(file_content, file_name):
         print("File uploaded successfully:", file_url)
         return file_url
     except Exception as e:
-        print("Error uploading file:", e)
+        print("Error uploading file:", str(e))
         return None
 
 
 @app.route("/get-input", methods=["POST"])
 def generate():
-    user_input = request.json
-    user_email = user_input.get("userEmail")
+    try:
+        user_input = request.json
+        print("Received request with input:", json.dumps(user_input, indent=2))
 
-    # Generate and upload to S3 as before
-    system_design = generate_system_design(user_input)
-    file_name = f"system_design_{uuid.uuid4()}.json"
-    file_url = upload_to_s3(system_design, file_name)
+        user_email = user_input.get("userEmail")
+        print("User email:", user_email)
 
-    # Add just the URL string to user's links array
-    if user_email:
-        try:
-            db.links.update_one(
-                {"email": user_email},
-                {"$push": {"links": file_url}},  # Correct syntax: push to 'links' array
-            )
-            print(f"Successfully added link for user: {user_email}")
-        except Exception as e:
-            print(f"Error updating links for {user_email}: {e}")
+        # Generate system design
+        system_design = generate_system_design(user_input)
+        if not system_design:
+            print("No system design generated")
+            return jsonify({"error": "Failed to generate system design"}), 500
 
-    return jsonify({"s3_link": file_url})
+        # Upload to S3
+        file_name = f"system_design_{uuid.uuid4()}.json"
+        file_url = upload_to_s3(system_design, file_name)
+        if not file_url:
+            print("Failed to upload to S3")
+            return jsonify({"error": "Failed to upload to S3"}), 500
+
+        # Add URL to user's links array
+        if user_email:
+            try:
+                db.links.update_one(
+                    {"email": user_email},
+                    {"$push": {"links": file_url}},
+                )
+                print(f"Successfully added link for user: {user_email}")
+            except Exception as e:
+                print(f"Error updating links for {user_email}: {e}")
+
+        return jsonify({"s3_link": file_url})
+
+    except Exception as e:
+        print("Error in generate endpoint:", str(e))
+        return jsonify({"error": str(e)}), 500
 
 
 if __name__ == "__main__":
