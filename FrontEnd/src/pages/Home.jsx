@@ -44,7 +44,7 @@ const Home = () => {
         };
 
         try {
-          const response = await axios.post('http://127.0.0.1:5002/get-input', finalData, {
+          const response = await axios.post('http://127.0.0.1:5000/get-input', finalData, {
             headers: {
               'Content-Type': 'application/json'
             },

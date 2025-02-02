@@ -4,27 +4,28 @@ from dotenv import load_dotenv
 import os
 import openai
 import boto3
+import json
+import uuid
 
 # Load environment variables and setup
 load_dotenv()
 app = Flask(__name__)
 CORS(app)
 
-
 # Initialize S3 client
-# s3 = boto3.client(
-#     "s3",
-#     aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
-#     aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
-#     aws_session_token=os.getenv("AWS_SESSION_TOKEN"),
-#     region_name=os.getenv("AWS_DEFAULT_REGION", "us-east-1"),
-# )
+s3 = boto3.client(
+    "s3",
+    aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
+    aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
+    aws_session_token=os.getenv("AWS_SESSION_TOKEN"),
+    region_name=os.getenv("AWS_DEFAULT_REGION", "us-east-1"),
+)
 
-# # Get bucket name from environment variables
-# BUCKET_NAME = os.getenv("AWS_BUCKET_NAME")
+# Get bucket name from environment variables
+BUCKET_NAME = os.getenv("AWS_BUCKET_NAME")
 
 # Initialize OpenAI client
-client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
 def generate_system_design(user_input):
@@ -62,8 +63,8 @@ def generate_system_design(user_input):
 
     try:
         # Call OpenAI API with structured prompt
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo-0125",
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
             messages=[
                 {
                     "role": "system",
@@ -71,7 +72,6 @@ def generate_system_design(user_input):
                 },
                 {"role": "user", "content": prompt},
             ],
-            response_format={"type": "json_object"},
             temperature=0.2,  # Lower temperature for more consistent, structured outputs
             max_tokens=4000,  # Ensure enough space for detailed workflows
             presence_penalty=0.1,  # Slight penalty to prevent repetition
@@ -79,28 +79,36 @@ def generate_system_design(user_input):
         )
 
         # Extract and return the JSON content
-        return response.choices[0].message.content
+        return response.choices[0].message["content"]
 
     except Exception as e:
         return f"Error generating workflow: {str(e)}"
 
 
-@app.route("/get-input", methods=["POST"])
-def create_workflow():
+def upload_to_s3(file_content, file_name):
     try:
-        user_input = request.get_json()
-        workflow = generate_system_design(user_input)
-
-        # Parse the JSON string from GPT response
-        import json
-
-        parsed_workflow = json.loads(workflow)
-
-        # Return clean JSON
-        return jsonify(parsed_workflow)
+        s3.put_object(
+            Bucket=BUCKET_NAME,
+            Key=file_name,
+            Body=file_content,
+            ContentType="application/json",
+        )
+        file_url = f"https://{BUCKET_NAME}.s3.amazonaws.com/{file_name}"
+        print("File uploaded successfully:", file_url)
+        return file_url
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        print("Error uploading file:", e)
+        return None
+
+
+@app.route("/get-input", methods=["POST"])
+def generate():
+    user_input = request.json
+    system_design = generate_system_design(user_input)
+    file_name = f"system_design_{uuid.uuid4()}.json"
+    file_url = upload_to_s3(system_design, file_name)
+    return jsonify({"s3_link": file_url})
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5002)
+    app.run(debug=True)
