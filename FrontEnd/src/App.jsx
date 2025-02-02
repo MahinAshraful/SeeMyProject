@@ -149,6 +149,16 @@ function App() {
 					}
 				/>
 
+          
+				<Route
+					path='/dashboard'
+					element={
+						<ProtectedRoute>
+							<DashboardPage />
+						</ProtectedRoute>
+					}
+				/>
+
 				<Route
 					path='/reset-password/:token'
 					element={
@@ -159,6 +169,8 @@ function App() {
 				/>
 				{/* catch all routes */}
 				<Route path='*' element={<Navigate to='/' replace />} />
+
+
 			</Routes>
         <Toaster 
           toastOptions={{

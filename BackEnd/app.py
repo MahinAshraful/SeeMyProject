@@ -3,11 +3,25 @@ from flask_cors import CORS
 from dotenv import load_dotenv
 import os
 import openai
+import boto3
 
 # Load environment variables and setup
 load_dotenv()
 app = Flask(__name__)
 CORS(app)
+
+
+# Initialize S3 client
+# s3 = boto3.client(
+#     "s3",
+#     aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
+#     aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
+#     aws_session_token=os.getenv("AWS_SESSION_TOKEN"),
+#     region_name=os.getenv("AWS_DEFAULT_REGION", "us-east-1"),
+# )
+
+# # Get bucket name from environment variables
+# BUCKET_NAME = os.getenv("AWS_BUCKET_NAME")
 
 # Initialize OpenAI client
 client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -22,8 +36,6 @@ def generate_system_design(user_input):
     - Description: {user_input['project_description']}
     - Core technologies: {', '.join(user_input['technologies'])}
     - New technologies to learn: {', '.join(user_input['new_technologies'])}
-    - Target industry: {user_input['target_industry']}
-    - Target audience: {user_input['target_audience']}
     - Additional features: {user_input['additional_info']}
     
     Generate an array of workflow cards where each card follows this exact structure:
@@ -78,11 +90,16 @@ def create_workflow():
     try:
         user_input = request.get_json()
         workflow = generate_system_design(user_input)
-        
-        return workflow
+
+        # Parse the JSON string from GPT response
+        import json
+
+        parsed_workflow = json.loads(workflow)
+
+        # Return clean JSON
+        return jsonify(parsed_workflow)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-        pass
 
 
 if __name__ == "__main__":
