@@ -1,131 +1,87 @@
-'''
-    - Flask endpoint to fetch data from react frontend and post to LLM model to generate response for mermaid.js code
-    done - Setup gemini api
-    - fine tune the prompt
-    done - define endpoints
-    done - test
-    - deploy
-    
-    1. Redefine the input and ask gemini to expand on the project. 
-    2. Use the expanded text to generate the 5 components
-'''
-
-import json
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from dotenv import load_dotenv
 import os
-import requests
+import openai
 
+# Load environment variables and setup
 load_dotenv()
 app = Flask(__name__)
 CORS(app)
 
-#Gemini API Key
-api_key = os.getenv('GEMINI_API_KEY')
+# Initialize OpenAI client
+client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-#Sample Data
-sample_data_1 = {
-    "project_name": "FitTrack",
-    "project_description": "be able to track user workouts, set fitness goals and monitor health progress",
-    "technologies": ["React Native, Firebase"],
-    "new_technologies": ["React Native"],
-}
 
-#User Input Dict
-user_input = {}
-user_input = sample_data_1
-def generate_project_explanation(user_input):
-
-    #Required Attributes
-    project_name = user_input.get('project_name')
-    project_description = user_input.get('project_description')
-    technologies = user_input.get('technologies')
-    new_technologies = user_input.get('new_technologies', 'n/a')
-
-    #Optional Attributes
-    target_indsutry = user_input.get('target_indsutry', '')
-    target_audience = user_input.get('target_audience', '')
-    addtional_info = user_input.get('addtional_info', '')
-
-    #Prompt
-    text_prompt = f"We want to create a {project_name} app. The app will {project_description}. We want to try to use {technologies}. We are relatively new to using {new_technologies}. Create a step-by-step plan to create this project. Suggest the tools and technologies to use and best practices. Return a plan that covers everything from frontend, backend, database, apis and packages to deployment."
+def generate_system_design(user_input):
+    # Structured prompt for OpenAI
+    prompt = f"""
+    Create a detailed development workflow for {user_input['project_name']} as a structured JSON array.
     
-    #Optional Prompt
-    optional_prompt = ""
-    if target_indsutry:
-        optional_prompt += f"Our app's Target Industry is {target_indsutry}. "
-    if target_audience:
-        optional_prompt += f"Our app's Target Audience is {target_audience}. "
-    if addtional_info:
-        optional_prompt += f"Also, {addtional_info}. "
+    Project Context:
+    - Description: {user_input['project_description']}
+    - Core technologies: {', '.join(user_input['technologies'])}
+    - New technologies to learn: {', '.join(user_input['new_technologies'])}
+    - Target industry: {user_input['target_industry']}
+    - Target audience: {user_input['target_audience']}
+    - Additional features: {user_input['additional_info']}
+    
+    Generate an array of workflow cards where each card follows this exact structure:
+    {{
+        "id": "unique_string",
+        "name": "component/task name",
+        "type": "learn" | "build" | "deploy",
+        "description": "detailed description of the task",
+        "technologies": ["specific technologies needed"],
+        "dependencies": ["ids of prerequisite cards"],
+        "category": "frontend" | "backend" | "database" | "deployment",
+        "resources": ["relevant documentation links or learning resources"]
+    }}
 
-    #Final Prompt
-    text_prompt = text_prompt + optional_prompt
+    Requirements:
+    1. Learning cards (type: "learn") should have no dependencies and come first
+    2. Build cards should depend on relevant learning cards
+    3. Deployment cards should come last in the workflow
+    4. Each card should have realistic time estimates
+    5. Include specific implementation details and resources
+    6. Ensure proper dependency chains between cards
+    7. Return only the JSON array without any additional text
+    """
 
-    url = f'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key={api_key}'
-    data = dict(contents=[dict(parts=[dict(text=text_prompt)])])
-    headers = {'Content-Type': 'application/json'}
-    response = requests.post(url, json=data, headers=headers)
-    res = response.json()['candidates'][0]['content']['parts'][0]['text']
-    return res
+    try:
+        # Call OpenAI API with structured prompt
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo-0125",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are a system design expert specialized in creating detailed technical workflows. Structure all responses as valid JSON arrays with comprehensive implementation details.",
+                },
+                {"role": "user", "content": prompt},
+            ],
+            response_format={"type": "json_object"},
+            temperature=0.2,  # Lower temperature for more consistent, structured outputs
+            max_tokens=4000,  # Ensure enough space for detailed workflows
+            presence_penalty=0.1,  # Slight penalty to prevent repetition
+            frequency_penalty=0.1,  # Slight penalty to encourage diverse technology suggestions
+        )
+
+        # Extract and return the JSON content
+        return response.choices[0].message.content
+
+    except Exception as e:
+        return f"Error generating workflow: {str(e)}"
 
 
-def generate_components(llm_output):
-
-    #Prompt
-    text_prompt = f"Use the following explanation to formally structure and categorize our project plan into json format. I want the plan to have 5 components: frontend, backend, database, API and packages, Deployment. Each of these components will further have: Tech Stack, Alternative technologies, Purpose and Getting-Started. \n\n {llm_output}"
-
-    url = f'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key={api_key}'
-    data = dict(contents=[dict(parts=[dict(text=text_prompt)])])
-    headers = {'Content-Type': 'application/json'}
-    response = requests.post(url, json=data, headers=headers)
-    res = response.json()['candidates'][0]['content']['parts'][0]['text']
-    return res
-
-#Testing the function
-#generated_content = generate_project_explanation(user_input)
-#final_res = generate_components(generated_content)
-#print(final_res)
+@app.route("/get-input", methods=["POST"])
+def create_workflow():
+    try:
+        user_input = request.get_json()
+        workflow = generate_system_design(user_input)
+        return jsonify({"workflow": workflow})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
-#Endpoint to fetch data from react frontend
-@app.route('/get-input', methods=['POST'])
-def get_input():
-
-    user_input = request.get_json()
-
-    # Required Attributes
-    required_fields = ['project_name', 'project_description', 'technologies']
-    missing_fields = [field for field in required_fields if field not in user_input]
-
-    if missing_fields:
-        return jsonify({'error': f'Missing required fields: {", ".join(missing_fields)}'}), 400
-
-    project_name = user_input.get('project_name')
-    project_description = user_input.get('project_description')
-    technologies = user_input.get('technologies')
-
-    # Optional Attributes
-    target_indsutry = user_input.get('target_indsutry', 'general')
-    target_audience = user_input.get('target_audience', 'general')
-    addtional_info = user_input.get('addtional_info', 'not provided')
-
-    # Create dictionary of attributes
-    attributes = {
-        'project_name': project_name,
-        'project_description': project_description,
-        'technologies': technologies,
-        'target_indsutry': target_indsutry,
-        'target_audience': target_audience,
-        'addtional_info': addtional_info
-    }
-
-    # Generate System Design content
-    generated_content = generate_project_explanation(attributes)
-    final_output = generate_components(generated_content)
-
-    return jsonify({'message': final_output})
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(debug=True, port=5002)
